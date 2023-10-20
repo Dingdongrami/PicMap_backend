@@ -2,7 +2,7 @@
 name: Feature
 about: 해당 이슈생성 템플릿을 사용하여 이슈를 생성해주세요.
 title: "[FEAT/STYLE/FIX/CHORE]"
-labels: enhancement, bug, documentation
+labels:
 assignees: ''
 
 ---
