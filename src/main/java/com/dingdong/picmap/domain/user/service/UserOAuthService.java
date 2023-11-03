@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.user.service;
 
+import com.dingdong.picmap.domain.user.entity.UserResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,12 @@ public class UserOAuthService {
 
         JsonNode userResourceNode = getUserResource(accessToken, registrationId);
         log.info("userResourceNode: {}", userResourceNode);
+
+        UserResource userResource = new UserResource(
+                userResourceNode.get("id").asText(),
+                userResourceNode.get("email").asText(),
+                userResourceNode.get("nickname").asText()
+        );
     }
 
     private String getAccessToken(String authorizationCode, String registrationId) {
