@@ -22,6 +22,9 @@ public class UserOAuthService {
         String accessToken = getAccessToken(code, registrationId);
         log.info("code: {}, registrationId: {}", code, registrationId);
         log.info("accessToken: {}", accessToken);
+
+        JsonNode userResourceNode = getUserResource(accessToken, registrationId);
+        log.info("userResourceNode: {}", userResourceNode);
     }
 
     private String getAccessToken(String authorizationCode, String registrationId) {
@@ -49,4 +52,12 @@ public class UserOAuthService {
         return accessTokenNode.asText();
     }
 
+    private JsonNode getUserResource(String accessToken, String registrationId) {
+        String resourceUri = env.getProperty("oauth2." + registrationId + ".resource-uri");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity entity = new HttpEntity(headers);
+        return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
+    }
 }
