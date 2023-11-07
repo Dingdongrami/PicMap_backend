@@ -1,15 +1,16 @@
 ---
 name: Feature
 about: 해당 이슈생성 템플릿을 사용하여 이슈를 생성해주세요.
-title: "[FEAT/STYLE/FIX]"
-labels: bug, documentation, duplicate, enhancement
+title: "[FEAT/STYLE/FIX/CHORE]"
+labels:
 assignees: ''
 
 ---
 
 ## 제목
 
-### 페이지
+
+### 할 일
 - [ ] 구현내용1
 - [ ] 구현내용2
 - [ ] 구현내용3
