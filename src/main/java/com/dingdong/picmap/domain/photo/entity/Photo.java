@@ -1,6 +1,7 @@
 package com.dingdong.picmap.domain.photo.entity;
 
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
+import com.dingdong.picmap.domain.user.entity.User;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -16,8 +17,9 @@ public class Photo extends BaseTimeEntity {
     @Column(name = "photo_id")
     private Long id;
 
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "file_path")
     private String filePath;

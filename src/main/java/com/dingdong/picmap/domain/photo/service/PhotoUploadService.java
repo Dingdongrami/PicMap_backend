@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,7 +21,9 @@ public class PhotoUploadService {
     @Autowired
     private S3Uploader s3Uploader;
 
+    @Transactional
     public Long uploadPhoto(MultipartFile image, Photo requestPhoto) throws IOException {
+        log.info("service - uploadPhoto ; image: {}", image);
         // image null check
         if (image == null) {
             throw new IllegalArgumentException("image is null");

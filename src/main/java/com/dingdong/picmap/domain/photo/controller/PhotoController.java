@@ -2,26 +2,35 @@ package com.dingdong.picmap.domain.photo.controller;
 
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.service.PhotoUploadService;
+import com.dingdong.picmap.domain.photo.service.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/photo")
 public class PhotoController {
 
     private final PhotoUploadService photoUploadService;
+    private final S3Uploader s3Uploader;
 
     // 사진 업로드
     @ResponseBody
-    @PostMapping(value = "/api/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Long uploadPhoto(HttpServletRequest request, @RequestBody MultipartFile file, Photo photo) throws Exception {
-        return photoUploadService.uploadPhoto(file, photo);
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String uploadPhoto(HttpServletRequest request, @RequestParam(value="image") MultipartFile file) throws Exception {
+        log.info("request: {}", request);
+        log.info("file: {}", file);
+        return s3Uploader.upload(file, "images");
+    }
+
+    @GetMapping("/")
+    public String index() {
+        return "index";
     }
 }
