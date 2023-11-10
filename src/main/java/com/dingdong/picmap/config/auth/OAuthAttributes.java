@@ -1,4 +1,4 @@
-package com.dingdong.picmap.config.oAuth;
+package com.dingdong.picmap.config.auth;
 
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.entity.enums.Role;
@@ -15,13 +15,14 @@ public class OAuthAttributes {
     private String nameAttributeKey;
     private String name;
     private String email;
+    private String picture;
 
-    static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
-        if ("naver".equals(registrationId)) {
-            return ofNaver("id", attributes);
-        } else if ("kakao".equals(registrationId)) {
-            return ofKakao("id", attributes);
-        }
+    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
+//        if ("naver".equals(registrationId)) {
+//            return ofNaver("id", attributes);
+//        } else if ("kakao".equals(registrationId)) {
+//            return ofKakao("id", attributes);
+//        }
         return ofGoogle(userNameAttributeName, attributes);
     }
 
@@ -29,6 +30,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
+                .picture((String) attributes.get("picture"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
@@ -40,6 +42,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
+                .picture((String) response.get("profile_image"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
@@ -51,6 +54,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) kakao_account.get("nickname"))
                 .email((String) kakao_account.get("email"))
+                .picture((String) kakao_account.get("profile_image_url"))
                 .attributes(kakao_account)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
@@ -58,7 +62,7 @@ public class OAuthAttributes {
 
     public User toEntity() {
         return User.builder()
-                .name(name)
+                .nickname(name)
                 .email(email)
                 .role(Role.USER)
                 .build();
