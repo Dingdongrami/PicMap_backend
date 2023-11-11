@@ -1,7 +1,7 @@
 package com.dingdong.picmap.domain.user.controller;
 
 import com.dingdong.picmap.config.auth.dto.SessionUser;
-import com.dingdong.picmap.domain.user.service.CustomOAuth2UserService;
+//import com.dingdong.picmap.domain.user.service.CustomOAuth2UserService;
 import com.dingdong.picmap.domain.user.service.UserOAuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
