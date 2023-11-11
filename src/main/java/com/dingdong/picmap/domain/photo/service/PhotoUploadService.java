@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.photo.service;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.repository.PhotoUploadRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,16 @@ public class PhotoUploadService {
             throw new IllegalArgumentException("image is null");
         }
 
-        String storeFileName = s3Uploader.upload(image, "requestPhoto");
+        String storeFileName = s3Uploader.upload(image, "images");
         requestPhoto.setFilePath(storeFileName);
+        // s3 upload 한 후에 해당 사진의 metadata 에서 longitude, latitude 추출
+
+
         Photo savedPhoto = photoUploadRepository.save(requestPhoto);
         return savedPhoto.getId();
+    }
+
+    public Photo getPhoto(Long id) {
+        return photoUploadRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 사진이 없습니다."));
     }
 }
