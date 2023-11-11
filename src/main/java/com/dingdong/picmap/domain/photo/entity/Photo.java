@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Table(name = "photos")
@@ -25,14 +26,26 @@ public class Photo extends BaseTimeEntity {
     private String filePath;
 
     @Column(name = "shooting_date")
-    private LocalDateTime shootingDate;
+    private Date shootingDate;
 
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
 
     //== file path 설정 메서드 ==//
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
+    //== shooting date 설정 메서드 ==//
+    public void setShootingDate(Date shootingDate) {
+        this.shootingDate = shootingDate;
+    }
+
+    //== gps 설정 메서드 ==//
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 }
