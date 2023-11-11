@@ -23,14 +23,17 @@ public class PhotoController {
     // 사진 업로드
     @ResponseBody
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String uploadPhoto(HttpServletRequest request, @RequestParam(value="image") MultipartFile file) throws Exception {
+    public Long uploadPhoto(HttpServletRequest request, @RequestParam(value="image") MultipartFile file) throws Exception {
         log.info("request: {}", request);
-        log.info("file: {}", file);
-        return s3Uploader.upload(file, "images");
+        log.info("file: {}", file.getOriginalFilename());
+        Photo photo = new Photo();
+        return photoUploadService.uploadPhoto(file, photo);
     }
 
+    // photo id 로 사진 조회
     @GetMapping("/")
-    public String index() {
-        return "index";
+    public Photo getPhoto(@RequestParam(value = "id") Long id) {
+        return photoUploadService.getPhoto(id);
     }
+
 }
