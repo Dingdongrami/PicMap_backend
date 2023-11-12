@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/photo")
+@RequestMapping("/api/photos")
 public class PhotoController {
 
     private final PhotoUploadService photoUploadService;
