@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 
@@ -46,10 +48,12 @@ public class PhotoUploadService {
         String storeFileName = s3Uploader.upload(file, "images");
 
         Map<String, Directory> readMetadata = s3Uploader.readMetadata(file);
-        double latitude = 0;
-        double longitude = 0;
-        // 임시 날짜
-        Date shootingDate = new Date();
+        // 초기값 : 서울역
+        double latitude = 37.55468153819696;
+        double longitude = 126.97059220394807;
+
+        // 초기값 : 2023-01-01 00:00:00
+        LocalDateTime shootingDate = LocalDateTime.parse("2023-01-01 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         if (readMetadata != null) {
             GpsDirectory gps = (GpsDirectory) readMetadata.get("gps");
@@ -57,14 +61,13 @@ public class PhotoUploadService {
 
             latitude = gps.getGeoLocation().getLatitude();
             longitude = gps.getGeoLocation().getLongitude();
-            shootingDate = exif.getDateOriginal();
+            Date exifDate = exif.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+            shootingDate = LocalDateTime.ofInstant(exifDate.toInstant(), ZoneId.systemDefault());
         }
 
         log.info("readMetadata finished");
         requestPhoto.setFilePath(storeFileName);
-        requestPhoto.setShootingDate(shootingDate);
-        requestPhoto.setLatitude(latitude);
-        requestPhoto.setLongitude(longitude);
+        requestPhoto.setMetaData(latitude, longitude, shootingDate);
 
         Photo savedPhoto = photoUploadRepository.save(requestPhoto);
         s3Uploader.readMetadata(file);
@@ -74,4 +77,11 @@ public class PhotoUploadService {
     public Photo getPhoto(Long id) {
         return photoUploadRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 사진이 없습니다."));
     }
+
+    /*
+    TODO : photo list 조회
+        카테고리 : 사용자 별
+        정렬 : 촬영 날짜, 업로드 날짜
+     */
+
 }
