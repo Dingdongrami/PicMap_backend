@@ -24,15 +24,21 @@ public class Photo extends BaseTimeEntity {
     @Column(name = "file_path")
     private String filePath;
 
-    @Column(name = "shooting_date")
+    @Column(name = "shooting_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime shootingDate;
 
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
 
     //== file path 설정 메서드 ==//
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
+    //== metadata 설정 메서드 ==//
+    public void setMetaData(Double latitude, Double longitude, LocalDateTime shootingDate) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.shootingDate = shootingDate;
+    }
 }
