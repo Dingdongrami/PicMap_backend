@@ -1,8 +1,10 @@
 package com.dingdong.picmap.config.jwt;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,19 +15,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class JwtTokenProvider {
+public class JwtTokenProvider implements InitializingBean {
 
     private Key key;
-    private static final String AUTHORITIES_KEY = "auth";
     private final String secret;
+    private static final String AUTHORITIES_KEY = "auth";
     private final long tokenValidityInMilliSeconds;
     private final long refreshTokenValidityInMilliSeconds;
 
@@ -33,8 +33,6 @@ public class JwtTokenProvider {
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
             @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInSeconds) {
-        byte[] secretByteKey = DatatypeConverter.parseBase64Binary(secret);
-        this.key = Keys.hmacShaKeyFor(secretByteKey);
         this.secret = secret;
         this.tokenValidityInMilliSeconds = tokenValidityInSeconds;
         this.refreshTokenValidityInMilliSeconds = refreshTokenValidityInSeconds;
@@ -72,8 +70,14 @@ public class JwtTokenProvider {
                 .build();
     }
 
+    // jwt token 복호화
     public Authentication getAuthentication(String accessToken) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+        Claims claims = Jwts
+                .parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
 
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
@@ -102,5 +106,11 @@ public class JwtTokenProvider {
             log.info("JWT 토큰이 잘못되었습니다.", e);
         }
         return false;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        byte[] secretByteKey = Decoders.BASE64.decode(secret);
+        this.key = Keys.hmacShaKeyFor(secretByteKey);
     }
 }
