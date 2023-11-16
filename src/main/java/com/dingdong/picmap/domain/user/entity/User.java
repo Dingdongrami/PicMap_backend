@@ -1,11 +1,8 @@
 package com.dingdong.picmap.domain.user.entity;
 
-import com.dingdong.picmap.domain.user.entity.enums.Role;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 
@@ -26,19 +23,30 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    private String picture;
+    @Column(nullable = false)
     private String password;
 
+    @Column(name = "profile_image")
+    private String profileImage;
+
+    private String introduce;
+
+    private String status;  // PUBLIC, PRIVATE
+
     @Builder
-    public User(String nickname, String email, String picture) {
+    public User(String nickname, String email, String profileImage, String introduce, String status) {
         this.nickname = nickname;
         this.email = email;
-        this.picture = picture;
+        this.profileImage = profileImage;
+        this.introduce = introduce;
+        this.status = status;
     }
 
-    public User update(String nickname, String picture) {
+    public User update(String nickname, String profileImage, String introduce, String status) {
         this.nickname = nickname;
-        this.picture = picture;
+        this.profileImage = profileImage;
+        this.introduce = introduce;
+        this.status = status;
         return this;
     }
 
