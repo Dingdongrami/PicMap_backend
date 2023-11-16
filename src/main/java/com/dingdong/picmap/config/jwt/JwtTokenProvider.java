@@ -14,7 +14,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,7 +59,6 @@ public class JwtTokenProvider implements InitializingBean {
 
         String refreshToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
                 .setIssuedAt(now)
                 .setExpiration(refreshTokenValidity)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -88,8 +89,8 @@ public class JwtTokenProvider implements InitializingBean {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        User principal = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, accessToken, authorities);
     }
 
     public boolean validateToken(String token) {
@@ -112,5 +113,12 @@ public class JwtTokenProvider implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         byte[] secretByteKey = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(secretByteKey);
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer"))
+            return bearerToken.substring(7);
+        return null;
     }
 }
