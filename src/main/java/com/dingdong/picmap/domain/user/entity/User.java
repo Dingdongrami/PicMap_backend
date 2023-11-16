@@ -29,15 +29,11 @@ public class User {
     private String picture;
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
     @Builder
-    public User(String nickname, String email, String picture, Role role) {
+    public User(String nickname, String email, String picture) {
         this.nickname = nickname;
         this.email = email;
         this.picture = picture;
-        this.role = role;
     }
 
     public User update(String nickname, String picture) {
@@ -46,7 +42,7 @@ public class User {
         return this;
     }
 
-    public String getRoleKey() {
-        return this.role.getKey();
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
