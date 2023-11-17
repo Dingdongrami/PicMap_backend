@@ -3,6 +3,7 @@ package com.dingdong.picmap.domain.photo.entity;
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import com.dingdong.picmap.domain.user.entity.User;
 import lombok.Getter;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class Photo extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @Column(name = "file_path")
@@ -40,5 +42,9 @@ public class Photo extends BaseTimeEntity {
         this.latitude = latitude;
         this.longitude = longitude;
         this.shootingDate = shootingDate;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
