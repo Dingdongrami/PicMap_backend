@@ -1,7 +1,6 @@
 package com.dingdong.picmap.domain.photo.controller;
 
 import com.dingdong.picmap.domain.photo.dto.PhotoResponse;
-import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequest;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.service.PhotoService;
 import com.dingdong.picmap.domain.photo.service.PhotoUploadService;
@@ -42,5 +41,11 @@ public class PhotoController {
     @GetMapping("/")
     public ResponseEntity<PhotoResponse> getPhoto(@RequestParam Long photoId) {
         return ResponseEntity.ok(photoService.getPhotoByPhotoId(photoId));
+    }
+
+    // user id 로 사진 리스트 조회
+    @GetMapping("/get/{userId}")
+    public ResponseEntity<List<PhotoResponse>> getPhotoByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(photoService.getPhotoByUserId(userId));
     }
 }
