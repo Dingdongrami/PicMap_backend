@@ -1,9 +1,13 @@
 package com.dingdong.picmap.domain.photo.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequest;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.repository.PhotoUploadRepository;
+import com.dingdong.picmap.domain.user.entity.User;
+import com.dingdong.picmap.domain.user.repository.UserRepository;
 import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
@@ -15,11 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 
@@ -30,18 +34,20 @@ import java.util.Map;
 public class PhotoUploadService {
 
     private final PhotoUploadRepository photoUploadRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     private S3Uploader s3Uploader;
 
     @SneakyThrows
     @Transactional
-    public Long uploadPhoto(MultipartFile image, Photo requestPhoto) throws IOException {
-        log.info("service - uploadPhoto ; image: {}", image);
-        // image null check
+    public Long uploadPhoto(MultipartFile image, Photo requestPhoto, Long userId) {
         if (image == null) {
             throw new IllegalArgumentException("image is null");
         }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다. id=" + userId));
 
         File file = s3Uploader.convert(image)
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
@@ -52,8 +58,8 @@ public class PhotoUploadService {
         double latitude = 37.55468153819696;
         double longitude = 126.97059220394807;
 
-        // 초기값 : 2023-01-01 00:00:00
-        LocalDateTime shootingDate = LocalDateTime.parse("2023-01-01 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        // 초기값 : 업로드 된 시간
+        LocalDateTime shootingDate = LocalDateTime.now();
 
         if (readMetadata != null) {
             GpsDirectory gps = (GpsDirectory) readMetadata.get("gps");
@@ -68,20 +74,10 @@ public class PhotoUploadService {
         log.info("readMetadata finished");
         requestPhoto.setFilePath(storeFileName);
         requestPhoto.setMetaData(latitude, longitude, shootingDate);
+        requestPhoto.setUser(user);
 
         Photo savedPhoto = photoUploadRepository.save(requestPhoto);
         s3Uploader.readMetadata(file);
         return savedPhoto.getId();
     }
-
-    public Photo getPhoto(Long id) {
-        return photoUploadRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 사진이 없습니다."));
-    }
-
-    /*
-    TODO : photo list 조회
-        카테고리 : 사용자 별
-        정렬 : 촬영 날짜, 업로드 날짜
-     */
-
 }
