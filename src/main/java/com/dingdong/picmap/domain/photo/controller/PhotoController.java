@@ -48,4 +48,13 @@ public class PhotoController {
     public ResponseEntity<List<PhotoResponse>> getPhotoByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(photoService.getPhotoByUserId(userId));
     }
+
+    @DeleteMapping("/{photoId}")
+    public ResponseEntity<String> deletePhoto(@PathVariable Long photoId) {
+        try {
+            return ResponseEntity.ok(photoService.deletePhoto(photoId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
