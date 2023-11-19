@@ -1,41 +1,56 @@
 package com.dingdong.picmap.domain.user.entity;
 
-import com.dingdong.picmap.domain.user.entity.enums.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 @Entity
 @Getter
+@Table(name = "users")
 @NoArgsConstructor
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
-    private String name;
+
+    @Column(nullable = false)
+    private String nickname;
+
+    @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "profile_image")
+    private String profileImage;
+
+    private String introduce;
+
+    private String status;  // PUBLIC, PRIVATE
 
     @Builder
-    public User(String name, String email, String password, Role role) {
-        this.name = name;
+    public User(String nickname, String email, String profileImage, String introduce, String status) {
+        this.nickname = nickname;
         this.email = email;
-        this.password = password;
-        this.role = role;
+        this.profileImage = profileImage;
+        this.introduce = introduce;
+        this.status = status;
     }
 
-    public String getRoleKey() {
-        return this.role.getKey();
-    }
-
-    public User update(String name) {
-        this.name = name;
+    public User update(String nickname, String profileImage, String introduce, String status) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.introduce = introduce;
+        this.status = status;
         return this;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
