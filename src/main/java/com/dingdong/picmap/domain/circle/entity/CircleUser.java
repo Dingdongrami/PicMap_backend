@@ -25,4 +25,8 @@ public class CircleUser {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public CircleUser(Circle circle, User user) {
+        this.circle = circle;
+        this.user = user;
+    }
 }
