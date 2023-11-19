@@ -42,6 +42,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle- 
 
+      # grant execute permission for gradlew
+      - name: Grant Execute Permission For Gradlew
+        run: chmod +x gradlew
+
       # create application.properties
       - name: Make application.properties
         if: contains(github.ref, 'main')
@@ -52,9 +56,7 @@ jobs:
         shell: bash
 
       - name: Build with Gradle
-        run: |
-          cd ../../..
-          ./gradlew clean build --exclude-task test
+        run: ./gradlew build -x test
 
       # docker image build
       - name: Docker image build
