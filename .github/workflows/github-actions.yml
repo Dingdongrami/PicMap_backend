@@ -33,7 +33,7 @@ jobs:
 
       # gradle caching
       - name: Gradle Caching
-      - uses: actions/cache@v3
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -89,7 +89,7 @@ jobs:
 
       # EC2 Server connection & docker deploy
       - name: EC2 Docker deploy
-      - uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
