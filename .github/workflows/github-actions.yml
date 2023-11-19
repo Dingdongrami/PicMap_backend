@@ -51,9 +51,10 @@ jobs:
           echo "${{ secrets.PROPERTIES }}" > ./application.yml
         shell: bash
 
-      # gradle build
       - name: Build with Gradle
-        run: ./gradlew clean build --exclude-task test
+        run: |
+          cd /home/ubuntu/picmap_backend/PicMap_backend
+          ./gradlew clean build --exclude-task test
 
       # docker image build
       - name: Docker image build
