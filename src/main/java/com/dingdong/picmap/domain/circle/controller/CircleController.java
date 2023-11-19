@@ -1,15 +1,12 @@
 package com.dingdong.picmap.domain.circle.controller;
 
 import com.dingdong.picmap.domain.circle.dto.CircleCreateRequestDto;
-import com.dingdong.picmap.domain.circle.dto.CircleCreateResponseDto;
+import com.dingdong.picmap.domain.circle.dto.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.service.CircleCreateService;
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +17,7 @@ public class CircleController extends BaseTimeEntity {
 
     // 써클 생성
     @PostMapping("/add-circle")
-    public ResponseEntity<CircleCreateResponseDto> createCircle(@RequestBody CircleCreateRequestDto request) {
+    public ResponseEntity<CircleResponseDto> createCircle(@RequestBody CircleCreateRequestDto request) {
         return ResponseEntity.ok(circleCreateService.createCircle(request));
     }
 
