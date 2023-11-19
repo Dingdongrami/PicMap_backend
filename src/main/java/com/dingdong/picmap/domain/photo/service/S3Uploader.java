@@ -35,16 +35,16 @@ public class S3Uploader {
 
     // MultipartFile 을 전달받아 File 로 전환한 후 S3에 업로드
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        log.info("upload (1) - multipartFile: {}", multipartFile);
         File uploadFile = convert(multipartFile)
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
         return upload(uploadFile, dirName);
     }
 
     public String upload(File uploadFile, String dirName) {
-        log.info("upload (2) - uploadFile: {}", uploadFile);
         String fileName = dirName + "/" + uploadFile.getName();
-        return putS3(uploadFile, fileName);
+        String uploadImageUrl = putS3(uploadFile, fileName);
+        removeNewFile(uploadFile);
+        return uploadImageUrl;
     }
 
     private String putS3(File uploadFile, String fileName) {
@@ -77,7 +77,6 @@ public class S3Uploader {
     }
 
     public Map<String, Directory> readMetadata(File uploadFile) throws ImageProcessingException, IOException {
-        log.info("readMetadata - uploadFile: {}", uploadFile);
         Metadata metadata = ImageMetadataReader.readMetadata(uploadFile);
         GpsDirectory gpsDirectory = metadata.getFirstDirectoryOfType(GpsDirectory.class);
         ExifSubIFDDirectory exifSubIFDDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);

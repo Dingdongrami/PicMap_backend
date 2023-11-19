@@ -4,6 +4,7 @@ import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.repository.PhotoUploadRepository;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
+import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -46,8 +48,16 @@ public class PhotoUploadService {
 
         File file = s3Uploader.convert(image)
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
-        String storeFileName = s3Uploader.upload(file, "images");
+        String storeFileUrl = s3Uploader.upload(file, "images");
+        Photo extractMetadataPhoto = extractMetadata(requestPhoto, file);
+        extractMetadataPhoto.setFilePath(storeFileUrl);
+        extractMetadataPhoto.setUser(user);
 
+        Photo savedPhoto = photoUploadRepository.save(extractMetadataPhoto);
+        return savedPhoto.getId();
+    }
+
+    public Photo extractMetadata(Photo photo, File file) throws ImageProcessingException, IOException {
         Map<String, Directory> readMetadata = s3Uploader.readMetadata(file);
         // 초기값 : 서울역
         double latitude = 37.55468153819696;
@@ -65,14 +75,7 @@ public class PhotoUploadService {
             Date exifDate = exif.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
             shootingDate = LocalDateTime.ofInstant(exifDate.toInstant(), ZoneId.systemDefault());
         }
-
-        log.info("readMetadata finished");
-        requestPhoto.setFilePath(storeFileName);
-        requestPhoto.setMetaData(latitude, longitude, shootingDate);
-        requestPhoto.setUser(user);
-
-        Photo savedPhoto = photoUploadRepository.save(requestPhoto);
-        s3Uploader.readMetadata(file);
-        return savedPhoto.getId();
+        photo.setMetaData(latitude, longitude, shootingDate);
+        return photo;
     }
 }
