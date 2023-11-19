@@ -53,7 +53,7 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          cd /home/ubuntu/picmap_backend/PicMap_backend
+          cd ../../..
           ./gradlew clean build --exclude-task test
 
       # docker image build
