@@ -2,7 +2,7 @@ package com.dingdong.picmap.domain.circle.service;
 
 import com.dingdong.picmap.config.util.UserUtils;
 import com.dingdong.picmap.domain.circle.dto.CircleCreateRequestDto;
-import com.dingdong.picmap.domain.circle.dto.CircleCreateResponseDto;
+import com.dingdong.picmap.domain.circle.dto.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.entity.CircleUser;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
@@ -24,12 +24,12 @@ public class CircleCreateService {
     private final UserUtils userUtils;
 
     // 써클 생성
-    public CircleCreateResponseDto createCircle(CircleCreateRequestDto request) {
+    public CircleResponseDto createCircle(CircleCreateRequestDto request) {
         User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         Circle circle = circleRepository.save(request.toEntity());
         addCircleMember(circle, user);
 //        addCircleMember(circle, userUtils.getUser());
-        return new CircleCreateResponseDto(circle.getId(), circle.getName());
+        return new CircleResponseDto(circle.getId(), circle.getName());
     }
 
     public void addCircleMember(Circle circle, User user) {
