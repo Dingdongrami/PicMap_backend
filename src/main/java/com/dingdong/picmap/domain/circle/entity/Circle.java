@@ -2,12 +2,14 @@ package com.dingdong.picmap.domain.circle.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Table(name = "circles")
+@NoArgsConstructor
 public class Circle {
 
     @Id
