@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/circle")
+@RequestMapping("/api/circles")
 public class CircleController extends BaseTimeEntity {
 
     private final CircleCreateService circleCreateService;
