@@ -1,7 +1,7 @@
 package com.dingdong.picmap.domain.photo.controller;
 
-import com.dingdong.picmap.domain.photo.dto.PhotoResponse;
-import com.dingdong.picmap.domain.photo.entity.Photo;
+import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
+import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.service.PhotoService;
 import com.dingdong.picmap.domain.photo.service.PhotoUploadService;
 import com.dingdong.picmap.domain.photo.service.S3Uploader;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Slf4j
@@ -29,24 +28,27 @@ public class PhotoController {
 
     // 사진 업로드
     @ResponseBody
-    @PostMapping(value = "/{userId}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Long uploadPhoto(HttpServletRequest request, @RequestParam(value="image") MultipartFile file, @PathVariable Long userId) throws Exception {
-        log.info("request: {}", request);
-        log.info("file: {}", file.getOriginalFilename());
-        Photo photo = new Photo();
-        return photoUploadService.uploadPhoto(file, photo, userId);
+    @PostMapping(value = "/upload")
+    public ResponseEntity<List<PhotoResponseDto>> uploadPhoto(@RequestParam(value="image") List<MultipartFile> files, @RequestBody PhotoUploadRequestDto requestDto) throws Exception {
+        return ResponseEntity.ok(photoUploadService.uploadPhoto(files, requestDto));
     }
 
     // photo id 로 사진 조회
     @GetMapping("/")
-    public ResponseEntity<PhotoResponse> getPhoto(@RequestParam Long photoId) {
+    public ResponseEntity<PhotoResponseDto> getPhoto(@RequestParam Long photoId) {
         return ResponseEntity.ok(photoService.getPhotoByPhotoId(photoId));
     }
 
     // user id 로 사진 리스트 조회
     @GetMapping("/get/{userId}")
-    public ResponseEntity<List<PhotoResponse>> getPhotoByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(photoService.getPhotoByUserId(userId));
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(photoService.getPhotosByUserId(userId));
+    }
+
+    // circle id 로 사진 리스트 조회
+    @GetMapping("/get/circle")
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoByCircleId(@RequestParam Long circleId) {
+        return ResponseEntity.ok(photoService.getPhotosByCircleId(circleId));
     }
 
     @DeleteMapping("/{photoId}")
