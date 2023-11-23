@@ -41,10 +41,10 @@ public class PhotoUploadService {
     private final PhotoUploadRepository photoUploadRepository;
     private final UserRepository userRepository;
     private final CircleRepository circleRepository;
-    private PhotoMetadataService photoMetadataService;
-    private CircleUserRepository circleUserRepository;
-    private CircleSharedAlbumRepository circleSharedAlbumRepository;
-    private CircleSharedAlbumMapper circleSharedAlbumMapper;
+    private final PhotoMetadataService photoMetadataService;
+    private final CircleUserRepository circleUserRepository;
+    private final CircleSharedAlbumRepository circleSharedAlbumRepository;
+    private final CircleSharedAlbumMapper circleSharedAlbumMapper;
 
     @Autowired
     private S3Uploader s3Uploader;
@@ -69,7 +69,7 @@ public class PhotoUploadService {
                 log.info("foreach -> image : {}", image);
                 String fileName = s3Uploader.upload(image);
                 log.info("fileName : {}", fileName);
-                Photo photo = new Photo().toEntity(user, fileName);
+                Photo photo = PhotoUploadRequestDto.toEntity(user, fileName);
                 try {
                     setMetadata(photo, image);
                 } catch (ImageProcessingException | IOException e) {
@@ -104,9 +104,9 @@ public class PhotoUploadService {
         return file;
     }
 
-    private Photo setMetadata(Photo photo, MultipartFile image) throws ImageProcessingException, IOException {
+    private Photo setMetadata(Photo photo, MultipartFile multipartFile) throws ImageProcessingException, IOException {
         log.info("photoUploadService setMetadata");
-        File file = convert(image);
+        File file = convert(multipartFile);
         log.info("file : {}", file);
         Map<String, Directory> metadata = photoMetadataService.getMetadata(file);
 

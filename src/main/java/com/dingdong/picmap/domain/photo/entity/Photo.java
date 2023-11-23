@@ -39,6 +39,11 @@ public class Photo extends BaseTimeEntity {
     private Double latitude;
     private Double longitude;
 
+    public Photo(User user, String filePath) {
+        this.user = user;
+        this.filePath = filePath;
+    }
+
     //== file path 설정 메서드 ==//
     public void setFilePath(String filePath) {
         this.filePath = filePath;
@@ -53,13 +58,5 @@ public class Photo extends BaseTimeEntity {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    // toEntity
-    public Photo toEntity(User user, String filePath) {
-    	return Photo.builder()
-    			.user(user)
-    			.filePath(filePath)
-    			.build();
     }
 }

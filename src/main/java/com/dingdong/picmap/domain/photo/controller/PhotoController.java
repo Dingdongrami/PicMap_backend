@@ -56,14 +56,14 @@ public class PhotoController {
     }
 
     // user id 로 사진 리스트 조회
-    @GetMapping("/get/{userId}")
+    @GetMapping("/get/user/{userId}")
     public ResponseEntity<List<PhotoResponseDto>> getPhotoByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(photoService.getPhotosByUserId(userId));
     }
 
     // circle id 로 사진 리스트 조회
-    @GetMapping("/get/circle")
-    public ResponseEntity<List<PhotoResponseDto>> getPhotoByCircleId(@RequestParam Long circleId) {
+    @GetMapping("/get/circle/{circleId}")
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoByCircleId(@PathVariable Long circleId) {
         return ResponseEntity.ok(photoService.getPhotosByCircleId(circleId));
     }
 

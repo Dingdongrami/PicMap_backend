@@ -36,8 +36,8 @@ public class S3Uploader {
         objectMetadata.setContentType(multipartFile.getContentType());
 
         putS3(multipartFile, fileName, objectMetadata);
-//        removeNewFile(convert(multipartFile));
-//        log.info("upload - fileName: {}", fileName);
+        removeNewFile(convert(multipartFile));
+        log.info("upload - fileName: {}", fileName);
         return fileName;
     }
 
