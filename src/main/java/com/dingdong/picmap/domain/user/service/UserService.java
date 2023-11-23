@@ -52,4 +52,9 @@ public class UserService {
         log.info("===> jwt token 생성 finish");
         return jwtTokenProvider.generateToken(authentication);
     }
+
+    // getUser
+    public User getUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+    }
 }
