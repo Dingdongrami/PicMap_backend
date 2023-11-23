@@ -6,13 +6,16 @@ import com.dingdong.picmap.domain.photo.service.PhotoService;
 import com.dingdong.picmap.domain.photo.service.PhotoUploadService;
 import com.dingdong.picmap.domain.photo.service.S3Uploader;
 import com.dingdong.picmap.domain.user.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Slf4j
@@ -25,12 +28,25 @@ public class PhotoController {
     private final PhotoService photoService;
     private final UserService userService;
     private final S3Uploader s3Uploader;
+    private final ObjectMapper objectMapper;
 
     // 사진 업로드
     @ResponseBody
     @PostMapping(value = "/upload")
-    public ResponseEntity<List<PhotoResponseDto>> uploadPhoto(@RequestParam(value="image") List<MultipartFile> files, @RequestBody PhotoUploadRequestDto requestDto) throws Exception {
-        return ResponseEntity.ok(photoUploadService.uploadPhoto(files, requestDto));
+    public ResponseEntity<List<PhotoResponseDto>> uploadPhoto(HttpServletRequest httpServletRequest) throws Exception {
+        if (!(httpServletRequest instanceof MultipartHttpServletRequest)) {
+            throw new IllegalArgumentException("MultipartHttpServletRequest is not valid");
+        }
+
+        MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
+        List<MultipartFile> images = multipartHttpServletRequest.getFiles("image");
+        String jsonData = multipartHttpServletRequest.getParameter("jsonData");
+        try {
+            PhotoUploadRequestDto requestDto = objectMapper.readValue(jsonData, PhotoUploadRequestDto.class);
+            return ResponseEntity.ok(photoUploadService.uploadPhoto(images, requestDto));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // photo id 로 사진 조회

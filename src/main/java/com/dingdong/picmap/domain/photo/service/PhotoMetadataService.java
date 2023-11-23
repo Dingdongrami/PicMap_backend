@@ -17,11 +17,14 @@ import java.util.Map;
 
 @Slf4j
 @Service
+
 public class PhotoMetadataService {
 
     public Map<String, Directory> getMetadata(File file) throws ImageProcessingException, IOException {
+        log.info("photoMetadataService getMetadata");
         Map<String, Directory> map = null;
         Metadata metadata = ImageMetadataReader.readMetadata(file);
+        log.info("metadata : {}", metadata);
         GpsDirectory gpsDirectory = metadata.getFirstDirectoryOfType(GpsDirectory.class);
         ExifSubIFDDirectory exifSubIFDDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
         if (gpsDirectory != null) {

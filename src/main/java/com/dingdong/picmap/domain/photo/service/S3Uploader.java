@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -25,6 +26,7 @@ public class S3Uploader {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+    private final String dirName = "images/";
 
     public String upload(MultipartFile multipartFile) {
 
@@ -34,12 +36,13 @@ public class S3Uploader {
         objectMetadata.setContentType(multipartFile.getContentType());
 
         putS3(multipartFile, fileName, objectMetadata);
-        removeNewFile((File) multipartFile);
+//        removeNewFile(convert(multipartFile));
+//        log.info("upload - fileName: {}", fileName);
         return fileName;
     }
 
     private String createFileName(String originalFileName) {
-        return UUID.randomUUID().toString().concat(getFileExtension(originalFileName));
+        return dirName + UUID.randomUUID() + getFileExtension(originalFileName);
     }
 
     // 파일 확장자 가져오기
@@ -60,6 +63,16 @@ public class S3Uploader {
         } catch (IOException e) {
             throw new IllegalArgumentException(String.format("파일 업로드 중 에러가 발생하였습니다. [%s]", fileName));
         }
+    }
+
+    private File convert(MultipartFile image) {
+        File file = new File(Objects.requireNonNull(image.getOriginalFilename()));
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(image.getBytes());
+        } catch (IOException e) {
+            log.error("파일 변환 실패", e);
+        }
+        return file;
     }
 
     private void removeNewFile(File file) {
