@@ -69,10 +69,7 @@ public class PhotoUploadService {
                 log.info("foreach -> image : {}", image);
                 String fileName = s3Uploader.upload(image);
                 log.info("fileName : {}", fileName);
-                Photo photo = Photo.builder()
-                                .user(user)
-                                .filePath(fileName)
-                                .build();
+                Photo photo = new Photo().toEntity(user, fileName);
                 try {
                     setMetadata(photo, image);
                 } catch (ImageProcessingException | IOException e) {

@@ -56,7 +56,7 @@ public class Photo extends BaseTimeEntity {
     }
 
     // toEntity
-    public Photo toEntity() {
+    public Photo toEntity(User user, String filePath) {
     	return Photo.builder()
     			.user(user)
     			.filePath(filePath)
