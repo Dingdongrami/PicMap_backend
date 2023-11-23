@@ -9,7 +9,6 @@ import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ public class UserService {
     private final SecurityUtils securityUtils;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserRepository userRepository;
     private final UserValidateService userValidateService;
 
@@ -43,13 +41,10 @@ public class UserService {
         final String requestEmail = loginRequestDto.getEmail();
         final String requestPassword = loginRequestDto.getPassword();
 
-        log.info("login email, password: {}, {}", requestEmail, requestPassword);
-
         User user = userRepository.findByEmail(requestEmail)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         userValidateService.validatePassword(requestPassword, user);
         Authentication authentication = securityUtils.setAuthentication(requestEmail, requestPassword);
-        log.info("===> jwt token 생성 finish");
         return jwtTokenProvider.generateToken(authentication);
     }
 
