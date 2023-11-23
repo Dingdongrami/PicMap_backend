@@ -1,7 +1,8 @@
 package com.dingdong.picmap.domain.user.controller;
 
 import com.dingdong.picmap.config.jwt.JwtToken;
-import com.dingdong.picmap.domain.user.dto.LoginRequest;
+import com.dingdong.picmap.domain.user.dto.LoginRequestDto;
+import com.dingdong.picmap.domain.user.dto.SignupRequestDto;
 import com.dingdong.picmap.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +17,14 @@ public class UserController {
 
     private final UserService userService;
 
+    @PostMapping("/signup")
+    public ResponseEntity<Long> signup(@RequestBody SignupRequestDto signupRequestDto) {
+        return ResponseEntity.ok(userService.signup(signupRequestDto));
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<JwtToken> login(@RequestBody LoginRequest loginRequest) {
-        log.info("login 시도");
-        log.info("login email: {}", loginRequest.getEmail());
-        return ResponseEntity.ok(userService.login(loginRequest));
+    public ResponseEntity<JwtToken> login(@RequestBody LoginRequestDto loginRequestDto) {
+        return ResponseEntity.ok(userService.login(loginRequestDto));
     }
 
 }

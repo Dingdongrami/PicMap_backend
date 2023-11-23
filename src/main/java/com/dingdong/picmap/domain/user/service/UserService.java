@@ -3,19 +3,18 @@ package com.dingdong.picmap.domain.user.service;
 import com.dingdong.picmap.config.jwt.JwtToken;
 import com.dingdong.picmap.config.jwt.JwtTokenProvider;
 import com.dingdong.picmap.config.util.SecurityUtils;
-import com.dingdong.picmap.domain.user.dto.LoginRequest;
+import com.dingdong.picmap.domain.user.dto.LoginRequestDto;
+import com.dingdong.picmap.domain.user.dto.SignupRequestDto;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 @Slf4j
 @Service
@@ -23,15 +22,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final SecurityUtils securityUtils;
+    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserRepository userRepository;
     private final UserValidateService userValidateService;
 
-    public JwtToken login(LoginRequest loginRequest) {
+    public Long signup(SignupRequestDto signupRequestDto) {
+        User user = User.builder()
+                .email(signupRequestDto.getEmail())
+                .password(passwordEncoder.encode(signupRequestDto.getPassword()))
+                .nickname(signupRequestDto.getNickname())
+                .roles(Collections.singletonList("ROLE_USER"))
+                .build();
+        return userRepository.save(user).getId();
+    }
 
-        final String requestEmail = loginRequest.getEmail();
-        final String requestPassword = loginRequest.getPassword();
+    public JwtToken login(LoginRequestDto loginRequestDto) {
+
+        final String requestEmail = loginRequestDto.getEmail();
+        final String requestPassword = loginRequestDto.getPassword();
 
         log.info("login email, password: {}, {}", requestEmail, requestPassword);
 
