@@ -48,7 +48,6 @@ jobs:
 
       # create application.properties
       - name: Make application.properties
-        if: contains(github.ref, 'main')
         run: |
           mkdir ./src/main/resources
           cd ./src/main/resources

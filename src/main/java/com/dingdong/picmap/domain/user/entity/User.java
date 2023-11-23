@@ -1,16 +1,27 @@
 package com.dingdong.picmap.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @Table(name = "users")
 @NoArgsConstructor
-public class User {
+@AllArgsConstructor
+@Builder
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +34,7 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -33,13 +45,40 @@ public class User {
 
     private String status;  // PUBLIC, PRIVATE
 
-    @Builder
-    public User(String nickname, String email, String profileImage, String introduce, String status) {
-        this.nickname = nickname;
-        this.email = email;
-        this.profileImage = profileImage;
-        this.introduce = introduce;
-        this.status = status;
+    @ElementCollection(fetch = FetchType.EAGER) // roles collection
+    @Builder.Default
+    private List<String> roles = new ArrayList<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public User update(String nickname, String profileImage, String introduce, String status) {
@@ -48,9 +87,5 @@ public class User {
         this.introduce = introduce;
         this.status = status;
         return this;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

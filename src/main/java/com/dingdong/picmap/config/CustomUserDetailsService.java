@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -29,7 +28,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private UserDetails createUserDetails(com.dingdong.picmap.domain.user.entity.User user){
-        log.info("createUserDetails");
         GrantedAuthority grantedAuthority =
                 new SimpleGrantedAuthority("ROLE_USER");
         return new User(user.getEmail(), user.getPassword(), Collections.singleton(grantedAuthority));
