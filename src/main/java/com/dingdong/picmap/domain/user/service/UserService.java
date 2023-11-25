@@ -3,8 +3,9 @@ package com.dingdong.picmap.domain.user.service;
 import com.dingdong.picmap.config.jwt.JwtToken;
 import com.dingdong.picmap.config.jwt.JwtTokenProvider;
 import com.dingdong.picmap.config.util.SecurityUtils;
-import com.dingdong.picmap.domain.user.dto.LoginRequestDto;
-import com.dingdong.picmap.domain.user.dto.SignupRequestDto;
+import com.dingdong.picmap.domain.user.dto.request.LoginRequestDto;
+import com.dingdong.picmap.domain.user.dto.request.SignupRequestDto;
+import com.dingdong.picmap.domain.user.dto.response.UserResponseDto;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Collections;
 
 @Slf4j
@@ -48,8 +48,8 @@ public class UserService {
         return jwtTokenProvider.generateToken(authentication);
     }
 
-    // getUser
-    public User getUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+    public UserResponseDto getUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+        return new UserResponseDto(user);
     }
 }
