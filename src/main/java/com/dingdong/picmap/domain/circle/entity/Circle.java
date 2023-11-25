@@ -19,11 +19,13 @@ public class Circle {
     private String name;
     private String description;
     private String status;  // PUBLIC, PRIVATE
+    private String thumbnail;
 
     @Builder
-    public Circle(String name, String description, String status) {
+    public Circle(String name, String description, String status, String thumbnail) {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.thumbnail = thumbnail;
     }
 }
