@@ -3,9 +3,13 @@ package com.dingdong.picmap.domain.user.service;
 import com.dingdong.picmap.config.jwt.JwtToken;
 import com.dingdong.picmap.config.jwt.JwtTokenProvider;
 import com.dingdong.picmap.config.util.SecurityUtils;
+import com.dingdong.picmap.domain.photo.service.S3Uploader;
 import com.dingdong.picmap.domain.user.dto.request.LoginRequestDto;
 import com.dingdong.picmap.domain.user.dto.request.SignupRequestDto;
+import com.dingdong.picmap.domain.user.dto.request.UserUpdateRequestDto;
+import com.dingdong.picmap.domain.user.dto.response.UserProfileUpdateResponseDto;
 import com.dingdong.picmap.domain.user.dto.response.UserResponseDto;
+import com.dingdong.picmap.domain.user.dto.response.UserUpdateResponseDto;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
 import java.util.Collections;
 
 @Slf4j
@@ -25,6 +32,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final UserValidateService userValidateService;
+    private final S3Uploader s3Uploader;
 
     public Long signup(SignupRequestDto signupRequestDto) {
         User user = User.builder()
@@ -51,5 +59,21 @@ public class UserService {
     public UserResponseDto getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
         return new UserResponseDto(user);
+    }
+
+
+    @Transactional
+    public UserUpdateResponseDto update(Long userId, UserUpdateRequestDto userUpdateRequestDto) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+        user.update(userUpdateRequestDto.getNickname(), userUpdateRequestDto.getIntroduce(), userUpdateRequestDto.getStatus());
+        return new UserUpdateResponseDto(user);
+    }
+
+    @Transactional
+    public UserProfileUpdateResponseDto updateProfile(Long userId, MultipartFile profileImage) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+        String profileImageUrl = s3Uploader.upload(profileImage, "profile");
+        user.updateProfile(profileImageUrl);
+        return new UserProfileUpdateResponseDto(user.getId(), profileImageUrl);
     }
 }

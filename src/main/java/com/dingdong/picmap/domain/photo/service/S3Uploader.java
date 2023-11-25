@@ -26,11 +26,10 @@ public class S3Uploader {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final String dirName = "images/";
 
-    public String upload(MultipartFile multipartFile) {
-
-        String fileName = createFileName(multipartFile.getOriginalFilename());
+    public String upload(MultipartFile multipartFile, String dirName) {
+        dirName = dirName + "/";
+        String fileName = createFileName(multipartFile.getOriginalFilename(), dirName);
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(multipartFile.getSize());
         objectMetadata.setContentType(multipartFile.getContentType());
@@ -41,7 +40,7 @@ public class S3Uploader {
         return fileName;
     }
 
-    private String createFileName(String originalFileName) {
+    private String createFileName(String originalFileName, String dirName) {
         return dirName + UUID.randomUUID() + getFileExtension(originalFileName);
     }
 
