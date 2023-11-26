@@ -9,18 +9,18 @@ import java.util.stream.Collectors;
 
 @Getter
 public class PhotoResponseDto {
-    private final Long photoId;
+    private final Long id;
     private final String filePath;
 
     @Builder
-    public PhotoResponseDto(Long photoId, String filePath) {
-        this.photoId = photoId;
+    public PhotoResponseDto(Long id, String filePath) {
+        this.id = id;
         this.filePath = filePath;
     }
 
-    public static PhotoResponseDto of(Long photoId, String filePath) {
+    public static PhotoResponseDto of(Long id, String filePath) {
     	return PhotoResponseDto.builder()
-    			.photoId(photoId)
+    			.id(id)
     			.filePath(filePath)
     			.build();
     }
