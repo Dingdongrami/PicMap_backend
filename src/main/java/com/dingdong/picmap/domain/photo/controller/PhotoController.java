@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.photo.controller;
 
+import com.dingdong.picmap.domain.photo.dto.PhotoLocationResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.service.PhotoService;
@@ -74,5 +75,10 @@ public class PhotoController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("{photoId}/location")
+    public ResponseEntity<PhotoLocationResponseDto> getLocation(@PathVariable Long photoId) {
+        return ResponseEntity.ok(photoService.getLocation(photoId));
     }
 }
