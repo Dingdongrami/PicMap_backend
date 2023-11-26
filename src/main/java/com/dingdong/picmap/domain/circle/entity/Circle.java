@@ -28,4 +28,9 @@ public class Circle {
         this.status = status;
         this.thumbnail = thumbnail;
     }
+
+    //==thumbnail 설정 메서드==//
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 }

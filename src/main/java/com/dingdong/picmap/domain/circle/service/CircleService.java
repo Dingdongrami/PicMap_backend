@@ -42,4 +42,15 @@ public class CircleService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public CircleResponseDto getCircle(Long circleId) {
+        Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        return CircleResponseDto.builder()
+                .id(circle.getId())
+                .name(circle.getName())
+                .description(circle.getDescription())
+                .status(circle.getStatus())
+                .thumbnail(circle.getThumbnail())
+                .build();
+    }
 }
