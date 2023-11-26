@@ -81,11 +81,14 @@ public class User implements UserDetails {
         return true;
     }
 
-    public User update(String nickname, String profileImage, String introduce, String status) {
+    public User update(String nickname, String introduce, String status) {
         this.nickname = nickname;
-        this.profileImage = profileImage;
         this.introduce = introduce;
         this.status = status;
         return this;
+    }
+
+    public void updateProfile(String profileImageUrl) {
+        this.profileImage = profileImageUrl;
     }
 }
