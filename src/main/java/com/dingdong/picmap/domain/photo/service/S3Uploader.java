@@ -36,7 +36,6 @@ public class S3Uploader {
 
         putS3(multipartFile, fileName, objectMetadata);
         removeNewFile(convert(multipartFile));
-        log.info("upload - fileName: {}", fileName);
         return fileName;
     }
 
@@ -54,8 +53,6 @@ public class S3Uploader {
     }
 
     private void putS3(MultipartFile uploadFile, String fileName, ObjectMetadata objectMetadata) {
-        log.info("putS3 - uploadFile: {}, fileName: {}", uploadFile, fileName);
-
         try(InputStream inputStream = uploadFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
@@ -70,6 +67,7 @@ public class S3Uploader {
             fos.write(image.getBytes());
         } catch (IOException e) {
             log.error("파일 변환 실패", e);
+            throw new IllegalArgumentException(String.format("파일 변환 실패 [%s]", image.getOriginalFilename()));
         }
         return file;
     }
@@ -79,6 +77,7 @@ public class S3Uploader {
             log.info("파일이 삭제되었습니다.");
         }else {
             log.info("파일이 삭제되지 못했습니다.");
+            throw new IllegalArgumentException(String.format("파일이 삭제되지 못했습니다. [%s]", file.getName()));
         }
     }
 }
