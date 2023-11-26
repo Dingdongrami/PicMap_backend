@@ -67,7 +67,7 @@ public class PhotoUploadService {
 
             images.forEach(image -> {
                 log.info("foreach -> image : {}", image);
-                String fileName = s3Uploader.upload(image);
+                String fileName = s3Uploader.upload(image, "images");
                 log.info("fileName : {}", fileName);
                 Photo photo = PhotoUploadRequestDto.toEntity(user, fileName);
                 try {
