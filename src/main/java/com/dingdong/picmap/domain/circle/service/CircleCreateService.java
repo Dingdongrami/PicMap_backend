@@ -29,7 +29,7 @@ public class CircleCreateService {
         Circle circle = circleRepository.save(request.toEntity());
         addCircleMember(circle, user);
 //        addCircleMember(circle, userUtils.getUser());
-        return new CircleResponseDto(circle.getId(), circle.getName());
+        return new CircleResponseDto(circle.getId(), circle.getName(), circle.getDescription());
     }
 
     public void addCircleMember(Circle circle, User user) {

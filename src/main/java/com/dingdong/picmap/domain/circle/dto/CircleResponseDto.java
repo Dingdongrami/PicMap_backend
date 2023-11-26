@@ -10,4 +10,5 @@ import lombok.Getter;
 public class CircleResponseDto {
     private Long id;
     private String name;
+    private String description;
 }
