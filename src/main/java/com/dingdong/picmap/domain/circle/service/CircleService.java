@@ -27,6 +27,7 @@ public class CircleService {
                 .map(circle -> CircleResponseDto.builder()
                         .id(circle.getId())
                         .name(circle.getName())
+                        .description(circle.getDescription())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -37,6 +38,7 @@ public class CircleService {
                 .map(circle -> CircleResponseDto.builder()
                         .id(circle.getId())
                         .name(circle.getName())
+                        .description(circle.getDescription())
                         .build())
                 .collect(Collectors.toList());
     }
