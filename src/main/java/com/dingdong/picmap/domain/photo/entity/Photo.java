@@ -2,7 +2,11 @@ package com.dingdong.picmap.domain.photo.entity;
 
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import com.dingdong.picmap.domain.user.entity.User;
+import jdk.jshell.Snippet;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
@@ -11,6 +15,9 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "photos")
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Photo extends BaseTimeEntity {
 
     @Id
@@ -31,6 +38,11 @@ public class Photo extends BaseTimeEntity {
 
     private Double latitude;
     private Double longitude;
+
+    public Photo(User user, String filePath) {
+        this.user = user;
+        this.filePath = filePath;
+    }
 
     //== file path 설정 메서드 ==//
     public void setFilePath(String filePath) {

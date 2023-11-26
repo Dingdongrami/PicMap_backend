@@ -8,26 +8,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class PhotoResponse {
+public class PhotoResponseDto {
     private final Long photoId;
     private final String filePath;
 
     @Builder
-    public PhotoResponse(Long photoId, String filePath) {
+    public PhotoResponseDto(Long photoId, String filePath) {
         this.photoId = photoId;
         this.filePath = filePath;
     }
 
-    public static PhotoResponse of(Long photoId, String filePath) {
-    	return PhotoResponse.builder()
+    public static PhotoResponseDto of(Long photoId, String filePath) {
+    	return PhotoResponseDto.builder()
     			.photoId(photoId)
     			.filePath(filePath)
     			.build();
     }
 
-     public static List<PhotoResponse> listOf(List<Photo> photos) {
+     public static List<PhotoResponseDto> listOf(List<Photo> photos) {
          return photos.stream()
-                 .map(photo -> PhotoResponse.of(photo.getId(), photo.getFilePath()))
+                 .map(photo -> PhotoResponseDto.of(photo.getId(), photo.getFilePath()))
                  .collect(Collectors.toList());
      }
 }
