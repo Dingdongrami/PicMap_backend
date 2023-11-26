@@ -1,7 +1,6 @@
 package com.dingdong.picmap.domain.circle.controller;
 
 import com.dingdong.picmap.domain.circle.dto.CircleCreateRequestDto;
-import com.dingdong.picmap.domain.circle.dto.CircleCreateResponseDto;
 import com.dingdong.picmap.domain.circle.dto.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.service.CircleCreateService;
 import com.dingdong.picmap.domain.circle.service.CircleService;
