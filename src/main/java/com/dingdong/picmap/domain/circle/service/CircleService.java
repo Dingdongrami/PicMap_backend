@@ -24,33 +24,19 @@ public class CircleService {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         List<Circle> circles = circleUserRepository.findCirclesByUserId(user);
         return circles.stream()
-                .map(circle -> CircleResponseDto.builder()
-                        .id(circle.getId())
-                        .name(circle.getName())
-                        .description(circle.getDescription())
-                        .build())
+                .map(CircleResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     public List<CircleResponseDto> getPublicCircles() {
         List<Circle> circles = circleRepository.findByStatus("PUBLIC");
         return circles.stream()
-                .map(circle -> CircleResponseDto.builder()
-                        .id(circle.getId())
-                        .name(circle.getName())
-                        .description(circle.getDescription())
-                        .build())
+                .map(CircleResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     public CircleResponseDto getCircle(Long circleId) {
         Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
-        return CircleResponseDto.builder()
-                .id(circle.getId())
-                .name(circle.getName())
-                .description(circle.getDescription())
-                .status(circle.getStatus())
-                .thumbnail(circle.getThumbnail())
-                .build();
+        return new CircleResponseDto(circle);
     }
 }

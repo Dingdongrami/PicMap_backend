@@ -37,13 +37,7 @@ public class CircleCreateService {
         addThumbnail(circle.getId(), thumbnail);
         addCircleMember(circle, user);
 //        addCircleMember(circle, userUtils.getUser());
-        return CircleResponseDto.builder()
-                .id(circle.getId())
-                .name(circle.getName())
-                .description(circle.getDescription())
-                .status(circle.getStatus())
-                .thumbnail(circle.getThumbnail())
-                .build();
+        return new CircleResponseDto(circle);
     }
 
     public void addCircleMember(Circle circle, User user) {
@@ -55,12 +49,6 @@ public class CircleCreateService {
         String thumbnailFilePath = s3Uploader.upload(file, "thumbnail");
         circle.setThumbnail(thumbnailFilePath);
         circleRepository.save(circle);
-        return CircleResponseDto.builder()
-                .id(circle.getId())
-                .name(circle.getName())
-                .description(circle.getDescription())
-                .status(circle.getStatus())
-                .thumbnail(circle.getThumbnail())
-                .build();
+        return new CircleResponseDto(circle);
     }
 }
