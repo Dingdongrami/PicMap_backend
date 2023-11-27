@@ -41,12 +41,9 @@ public class PhotoController {
         MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
         List<MultipartFile> images = multipartHttpServletRequest.getFiles("image");
         String jsonData = multipartHttpServletRequest.getParameter("jsonData");
-        try {
-            PhotoUploadRequestDto requestDto = objectMapper.readValue(jsonData, PhotoUploadRequestDto.class);
-            return ResponseEntity.ok(photoUploadService.uploadPhoto(images, requestDto));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+
+        PhotoUploadRequestDto requestDto = objectMapper.readValue(jsonData, PhotoUploadRequestDto.class);
+        return ResponseEntity.ok(photoUploadService.uploadPhoto(images, requestDto));
     }
 
     // photo id 로 사진 조회
