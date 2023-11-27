@@ -2,6 +2,7 @@ package com.dingdong.picmap.domain.user.service;
 
 import com.dingdong.picmap.config.jwt.JwtToken;
 import com.dingdong.picmap.config.jwt.JwtTokenProvider;
+import com.dingdong.picmap.config.util.RedisUtils;
 import com.dingdong.picmap.config.util.SecurityUtils;
 import com.dingdong.picmap.domain.photo.service.S3Uploader;
 import com.dingdong.picmap.domain.user.dto.request.LoginRequestDto;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
 import java.util.Collections;
 
 @Slf4j
@@ -28,6 +30,7 @@ import java.util.Collections;
 public class UserService {
 
     private final SecurityUtils securityUtils;
+    private final RedisUtils redisUtils;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
@@ -53,7 +56,9 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         userValidateService.validatePassword(requestPassword, user);
         Authentication authentication = securityUtils.setAuthentication(requestEmail, requestPassword);
-        return jwtTokenProvider.generateToken(authentication);
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+        redisUtils.setValues(authentication.getName(), jwtToken.getRefreshToken(), Duration.ofDays(14));
+        return jwtToken;
     }
 
     public UserResponseDto getUser(Long userId) {
