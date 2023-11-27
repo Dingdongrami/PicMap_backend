@@ -31,9 +31,10 @@ public class CircleCreateService {
     private final UserUtils userUtils;
 
     // 써클 생성
-    public CircleResponseDto createCircle(CircleCreateRequestDto request) {
+    public CircleResponseDto createCircle(CircleCreateRequestDto request, MultipartFile thumbnail) throws IOException {
         User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         Circle circle = circleRepository.save(request.toEntity());
+        addThumbnail(circle.getId(), thumbnail);
         addCircleMember(circle, user);
 //        addCircleMember(circle, userUtils.getUser());
         return CircleResponseDto.builder()
@@ -41,6 +42,7 @@ public class CircleCreateService {
                 .name(circle.getName())
                 .description(circle.getDescription())
                 .status(circle.getStatus())
+                .thumbnail(circle.getThumbnail())
                 .build();
     }
 
@@ -50,7 +52,7 @@ public class CircleCreateService {
 
     public CircleResponseDto addThumbnail(Long circleId, MultipartFile file) throws IOException {
         Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
-        String thumbnailFilePath = s3Uploader.upload(file, "images");
+        String thumbnailFilePath = s3Uploader.upload(file, "thumbnail");
         circle.setThumbnail(thumbnailFilePath);
         circleRepository.save(circle);
         return CircleResponseDto.builder()
