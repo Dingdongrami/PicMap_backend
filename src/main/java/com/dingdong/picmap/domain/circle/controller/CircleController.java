@@ -8,7 +8,9 @@ import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,6 +25,18 @@ public class CircleController extends BaseTimeEntity {
     @PostMapping("/add-circle")
     public ResponseEntity<CircleResponseDto> createCircle(@RequestBody CircleCreateRequestDto request) {
         return ResponseEntity.ok(circleCreateService.createCircle(request));
+    }
+
+    // 써클 thumbnail 등록
+    @PostMapping("/{circleId}/add-thumbnail")
+    public ResponseEntity<CircleResponseDto> addThumbnail(@PathVariable Long circleId, @RequestPart("thumbnail") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(circleCreateService.addThumbnail(circleId, file));
+    }
+
+    // 써클 조회
+    @GetMapping("/{circleId}")
+    public ResponseEntity<CircleResponseDto> getCircle(@PathVariable Long circleId) {
+        return ResponseEntity.ok(circleService.getCircle(circleId));
     }
 
     // 해당 user 가 가입된 써클 리스트 조회
