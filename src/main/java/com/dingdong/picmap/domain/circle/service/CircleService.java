@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.circle.service;
 
+import com.dingdong.picmap.domain.circle.dto.CircleRequestDto;
 import com.dingdong.picmap.domain.circle.dto.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
@@ -9,6 +10,7 @@ import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,13 @@ public class CircleService {
 
     public CircleResponseDto getCircle(Long circleId) {
         Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        return new CircleResponseDto(circle);
+    }
+
+    @Transactional
+    public CircleResponseDto updateCircle(Long circleId, CircleRequestDto circleRequestDto) {
+        Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        circle.update(circleRequestDto);
         return new CircleResponseDto(circle);
     }
 }
