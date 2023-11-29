@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.circle.entity;
 
+import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,8 +30,21 @@ public class Circle {
         this.thumbnail = thumbnail;
     }
 
+    @Builder
+    public Circle(String name, String description, String status) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
     //==thumbnail 설정 메서드==//
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public void update(Circle circle) {
+        this.name = circle.getName();
+        this.description = circle.getDescription();
+        this.status = circle.getStatus();
     }
 }
