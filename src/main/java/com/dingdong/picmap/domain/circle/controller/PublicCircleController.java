@@ -1,6 +1,7 @@
 package com.dingdong.picmap.domain.circle.controller;
 
 import com.dingdong.picmap.domain.circle.dto.request.CircleJoinRequestDto;
+import com.dingdong.picmap.domain.circle.dto.request.CircleLeaveRequestDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.service.CircleService;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,15 @@ public class PublicCircleController {
         return ResponseEntity.ok(circleService.getPublicCircles());
     }
 
-    // 써클 가입, 탈퇴
     @PostMapping("/join")
-    public ResponseEntity<String> joinCircle(@RequestBody CircleJoinRequestDto requestDto) {
+    public ResponseEntity<?> joinCircle(@RequestBody CircleJoinRequestDto requestDto) {
         circleService.joinCircle(requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/leave")
+    public ResponseEntity<String> leaveCircle(@RequestBody CircleLeaveRequestDto requestDto) {
+        circleService.leaveCircle(requestDto);
         return ResponseEntity.ok("success");
     }
 

@@ -1,10 +1,12 @@
 package com.dingdong.picmap.domain.circle.service;
 
 import com.dingdong.picmap.domain.circle.dto.request.CircleJoinRequestDto;
+import com.dingdong.picmap.domain.circle.dto.request.CircleLeaveRequestDto;
 import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleUserResponseDto;
 import com.dingdong.picmap.domain.circle.entity.Circle;
+import com.dingdong.picmap.domain.circle.entity.CircleUser;
 import com.dingdong.picmap.domain.circle.mapper.CircleEntityMapper;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +69,27 @@ public class CircleService {
 
     @Transactional
     public void joinCircle(CircleJoinRequestDto requestDto) {
-        circleEntityMapper.toCircleUserEntity(requestDto).forEach(circleUserRepository::save);
+        Circle circle = circleRepository.findById(requestDto.getCircleId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
+        if (circleUserRepository.existsByCircleAndUser(circle, user)) {
+            throw new IllegalArgumentException("이미 가입된 써클입니다.");
+        }
+        circleUserRepository.save(new CircleUser(circle, user));
     }
+
+    @Transactional
+    public void leaveCircle(CircleLeaveRequestDto requestDto) {
+
+        Circle circle = circleRepository.findById(requestDto.getCircleId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        List<User> users = requestDto.getUserIdList().stream()
+                .map(userId -> userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다.")))
+                .collect(Collectors.toList());
+
+        users.stream()
+                .filter(user -> circleUserRepository.existsByCircleAndUser(circle, user))
+                .map(user -> circleUserRepository.findCircleUserByCircleAndUser(user, circle).orElseThrow(() -> new IllegalArgumentException("해당 써클에 존재하지 않는 유저입니다.")))
+                .forEach(circleUserRepository::delete);
+    }
+
 }
