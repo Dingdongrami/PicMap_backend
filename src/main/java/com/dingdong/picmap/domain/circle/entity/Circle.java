@@ -1,6 +1,6 @@
 package com.dingdong.picmap.domain.circle.entity;
 
-import com.dingdong.picmap.domain.circle.dto.CircleRequestDto;
+import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

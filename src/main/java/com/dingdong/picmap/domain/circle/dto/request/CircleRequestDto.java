@@ -1,4 +1,4 @@
-package com.dingdong.picmap.domain.circle.dto;
+package com.dingdong.picmap.domain.circle.dto.request;
 
 import lombok.*;
 
