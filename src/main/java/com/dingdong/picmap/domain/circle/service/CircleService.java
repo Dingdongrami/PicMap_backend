@@ -1,10 +1,12 @@
 package com.dingdong.picmap.domain.circle.service;
 
-import com.dingdong.picmap.domain.circle.dto.CircleRequestDto;
-import com.dingdong.picmap.domain.circle.dto.CircleResponseDto;
+import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
+import com.dingdong.picmap.domain.circle.dto.response.CircleResponseDto;
+import com.dingdong.picmap.domain.circle.dto.response.CircleUserResponseDto;
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
+import com.dingdong.picmap.domain.user.dto.response.UserResponseDto;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +49,14 @@ public class CircleService {
         Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
         circle.update(circleRequestDto);
         return new CircleResponseDto(circle);
+    }
+
+    public CircleUserResponseDto getCircleMembers(Long circleId) {
+        Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        List<User> users = circleUserRepository.findUsersByTeam(circle);
+        List<UserResponseDto> userResponseDtoList = users.stream()
+                .map(UserResponseDto::new)
+                .collect(Collectors.toList());
+        return new CircleUserResponseDto(circle, userResponseDtoList);
     }
 }
