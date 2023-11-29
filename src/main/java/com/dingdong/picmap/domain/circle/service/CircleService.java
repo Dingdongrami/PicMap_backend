@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.circle.service;
 
+import com.dingdong.picmap.domain.circle.dto.request.CircleJoinRequestDto;
 import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleUserResponseDto;
@@ -61,5 +62,9 @@ public class CircleService {
                 .map(UserResponseDto::new)
                 .collect(Collectors.toList());
         return new CircleUserResponseDto(circle, userResponseDtoList);
+    }
+
+    public void joinCircle(CircleJoinRequestDto requestDto) {
+        circleEntityMapper.toCircleUserEntity(requestDto).forEach(circleUserRepository::save);
     }
 }
