@@ -31,6 +31,8 @@ public class CircleEntityMapper {
         Circle circle = circleRepository.findById(circleJoinRequestDto.getCircleId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
         return circleJoinRequestDto.getUserIds().stream()
                 .map(userId -> userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다.")))
+                // 이미 써클에 가입되어있는 유저인지 확인
+                .filter(user -> !circleRepository.existsByCircleUser(circle, user))
                 .map(user -> new CircleUser(circle, user))
                 .collect(Collectors.toList());
     }

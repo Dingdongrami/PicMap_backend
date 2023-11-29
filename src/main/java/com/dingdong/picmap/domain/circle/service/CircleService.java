@@ -64,6 +64,7 @@ public class CircleService {
         return new CircleUserResponseDto(circle, userResponseDtoList);
     }
 
+    @Transactional
     public void joinCircle(CircleJoinRequestDto requestDto) {
         circleEntityMapper.toCircleUserEntity(requestDto).forEach(circleUserRepository::save);
     }
