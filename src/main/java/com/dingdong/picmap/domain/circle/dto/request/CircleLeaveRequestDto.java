@@ -3,10 +3,12 @@ package com.dingdong.picmap.domain.circle.dto.request;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
-public class CircleJoinRequestDto {
+public class CircleLeaveRequestDto {
 
-    private Long circleId;
-    private Long userId;
+      private Long circleId;
+      private List<Long> userIdList;
 }

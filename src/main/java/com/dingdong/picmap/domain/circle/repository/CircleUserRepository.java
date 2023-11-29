@@ -28,4 +28,6 @@ public interface CircleUserRepository extends JpaRepository<CircleUser, Long> {
             + "INNER JOIN CircleUser cU ON cU.user = u "
             + "WHERE cU.circle = :circle")
     List<User> findUsersByTeam(@Param("circle") Circle circle);
+
+    boolean existsByCircleAndUser(Circle circle, User user);
 }
