@@ -4,6 +4,7 @@ import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleUserResponseDto;
 import com.dingdong.picmap.domain.circle.entity.Circle;
+import com.dingdong.picmap.domain.circle.mapper.CircleEntityMapper;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
 import com.dingdong.picmap.domain.user.dto.response.UserResponseDto;
@@ -23,6 +24,7 @@ public class CircleService {
     private final CircleRepository circleRepository;
     private final CircleUserRepository circleUserRepository;
     private final UserRepository userRepository;
+    private final CircleEntityMapper circleEntityMapper;
 
     public List<CircleResponseDto> getCirclesByUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
@@ -45,9 +47,10 @@ public class CircleService {
     }
 
     @Transactional
-    public CircleResponseDto updateCircle(Long circleId, CircleRequestDto circleRequestDto) {
-        Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
-        circle.update(circleRequestDto);
+    public CircleResponseDto updateCircle(CircleRequestDto circleRequestDto) {
+        Circle circle = circleRepository.findById(circleRequestDto.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        Circle requestCircle = circleEntityMapper.toCircleEntity(circleRequestDto);
+        circle.update(requestCircle);
         return new CircleResponseDto(circle);
     }
 

@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 public class CircleRequestDto {
 
+    private Long id;
     private String name;
     private String description;
     private String status;
