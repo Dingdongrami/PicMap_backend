@@ -1,5 +1,7 @@
 package com.dingdong.picmap.domain.photo.controller;
 
+import com.dingdong.picmap.domain.photo.dto.CameraPhotoUploadRequestDto;
+import com.dingdong.picmap.domain.photo.dto.PhotoLocationResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.service.PhotoService;
@@ -46,6 +48,24 @@ public class PhotoController {
         return ResponseEntity.ok(photoUploadService.uploadPhoto(images, requestDto));
     }
 
+    // 사진 업로드 - 카메라로 촬영 시
+    @PostMapping("/upload-camera")
+    public ResponseEntity<PhotoResponseDto> uploadPhotoByCamera(HttpServletRequest httpServletRequest) {
+        if (!(httpServletRequest instanceof MultipartHttpServletRequest)) {
+            throw new IllegalArgumentException("MultipartHttpServletRequest is not valid");
+        }
+
+        MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
+        MultipartFile image = multipartHttpServletRequest.getFile("image");
+        String jsonData = multipartHttpServletRequest.getParameter("jsonData");
+        try {
+            CameraPhotoUploadRequestDto requestDto = objectMapper.readValue(jsonData, CameraPhotoUploadRequestDto.class);
+            return ResponseEntity.ok(photoUploadService.uploadPhoto(image, requestDto));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     // photo id 로 사진 조회
     @GetMapping("/")
     public ResponseEntity<PhotoResponseDto> getPhoto(@RequestParam Long photoId) {
@@ -71,5 +91,10 @@ public class PhotoController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("{photoId}/location")
+    public ResponseEntity<PhotoLocationResponseDto> getLocation(@PathVariable Long photoId) {
+        return ResponseEntity.ok(photoService.getLocation(photoId));
     }
 }

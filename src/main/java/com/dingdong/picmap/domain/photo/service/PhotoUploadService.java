@@ -1,12 +1,13 @@
 package com.dingdong.picmap.domain.photo.service;
 
 import com.dingdong.picmap.domain.circle.entity.Circle;
-import com.dingdong.picmap.domain.circle.entity.CircleUser;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
+import com.dingdong.picmap.domain.photo.dto.CameraPhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.entity.Photo;
+import com.dingdong.picmap.domain.photo.mapper.PhotoEntityMapper;
 import com.dingdong.picmap.domain.photo.repository.PhotoUploadRepository;
 import com.dingdong.picmap.domain.sharedAlbum.mapper.CircleSharedAlbumMapper;
 import com.dingdong.picmap.domain.sharedAlbum.repository.CircleSharedAlbumRepository;
@@ -17,7 +18,6 @@ import com.drew.metadata.Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,9 +41,10 @@ public class PhotoUploadService {
     private final PhotoUploadRepository photoUploadRepository;
     private final UserRepository userRepository;
     private final CircleRepository circleRepository;
-    private final PhotoMetadataService photoMetadataService;
     private final CircleUserRepository circleUserRepository;
     private final CircleSharedAlbumRepository circleSharedAlbumRepository;
+    private final PhotoMetadataService photoMetadataService;
+    private final PhotoEntityMapper photoEntityMapper;
     private final CircleSharedAlbumMapper circleSharedAlbumMapper;
 
     @Autowired
@@ -51,39 +52,29 @@ public class PhotoUploadService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<PhotoResponseDto> uploadPhoto(List<MultipartFile> images, PhotoUploadRequestDto requestDto) {
-        log.info("images : {}, requestDto : {}", images, requestDto);
         if (images.isEmpty()) {
             throw new IllegalArgumentException("이미지가 없습니다.");
         }
-        log.info("requestDto.getUserId() : {}, requestDto.getCircleId() : {}", requestDto.getUserId(), requestDto.getCircleId());
         List<Photo> photoList = new ArrayList<>();
         try {
             User user = userRepository.findById(requestDto.getUserId())
                     .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다. id=" + requestDto.getUserId()));
-            log.info("user : {}", user);
             Circle circle = circleRepository.findById(requestDto.getCircleId())
                     .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다. id=" + requestDto.getCircleId()));
-            log.info("circle : {}", circle);
 
             images.forEach(image -> {
-                log.info("foreach -> image : {}", image);
                 String fileName = s3Uploader.upload(image, "images");
-                log.info("fileName : {}", fileName);
-                Photo photo = PhotoUploadRequestDto.toEntity(user, fileName);
+                Photo photo = PhotoEntityMapper.toPhotoEntity(user, fileName);
                 try {
                     setMetadata(photo, image);
                 } catch (ImageProcessingException | IOException e) {
                     throw new RuntimeException(e);
                 }
-                log.info("setMetadataPhoto id : {}, filePath : {}", photo.getId(), photo.getFilePath());
                 photo.setFilePath(fileName);
                 photo.setUser(user);
-                log.info("setMetadataPhoto : {} ", photo);
                 Photo savedPhoto = photoUploadRepository.save(photo);
                 photoList.add(savedPhoto);
-                log.info("photoList : {}", photoList);
                 circleSharedAlbumRepository.save(circleSharedAlbumMapper.createCircleSharedAlbum(savedPhoto, circle, user));
-                log.info("circleSharedAlbumRepository : {}", circleSharedAlbumRepository);
             });
         } catch (Exception e) {
             log.error("사진 업로드 실패", e);
@@ -93,21 +84,44 @@ public class PhotoUploadService {
         return PhotoResponseDto.listOf(photoList);
     }
 
-    private File convert(MultipartFile image) {
+    @Transactional
+    public PhotoResponseDto uploadPhoto(MultipartFile image, CameraPhotoUploadRequestDto requestDto) throws ImageProcessingException, IOException {
+        if (image.isEmpty()) {
+            throw new IllegalArgumentException("이미지가 없습니다.");
+        }
+        try {
+            User user = userRepository.findById(requestDto.getUserId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다. id=" + requestDto.getUserId()));
+            Circle circle = circleRepository.findById(requestDto.getCircleId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다. id=" + requestDto.getCircleId()));
+
+            String fileName = s3Uploader.upload(image, "images");
+            Photo photo = PhotoEntityMapper.toPhotoEntity(user, fileName);
+            photo.setFilePath(fileName);
+            photo.setMetaData(requestDto.getLatitude(), requestDto.getLongitude(), LocalDateTime.parse(requestDto.getShootingDate()));
+
+            Photo savedPhoto = photoUploadRepository.save(photo);
+            circleSharedAlbumRepository.save(circleSharedAlbumMapper.createCircleSharedAlbum(savedPhoto, circle, user));
+            return PhotoResponseDto.of(savedPhoto.getId(), savedPhoto.getFilePath());
+        } catch (Exception e) {
+            log.error("사진 업로드 실패", e);
+            throw e;
+        }
+    }
+
+    private File convert(MultipartFile image) throws IOException {
         File file = new File(Objects.requireNonNull(image.getOriginalFilename()));
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(image.getBytes());
-            log.info("파일 변환 성공");
         } catch (IOException e) {
             log.error("파일 변환 실패", e);
+            throw e;
         }
         return file;
     }
 
     private Photo setMetadata(Photo photo, MultipartFile multipartFile) throws ImageProcessingException, IOException {
-        log.info("photoUploadService setMetadata");
         File file = convert(multipartFile);
-        log.info("file : {}", file);
         Map<String, Directory> metadata = photoMetadataService.getMetadata(file);
 
         // 초기값 : 서울역

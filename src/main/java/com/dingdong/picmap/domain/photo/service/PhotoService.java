@@ -2,6 +2,7 @@ package com.dingdong.picmap.domain.photo.service;
 
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
+import com.dingdong.picmap.domain.photo.dto.PhotoLocationResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.repository.PhotoRepository;
@@ -51,5 +52,16 @@ public class PhotoService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 써클이 없습니다. id=" + circleId));
         List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
         return PhotoResponseDto.listOf(findPhotos);
+    }
+
+    public PhotoLocationResponseDto getLocation(Long photoId) {
+        Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사진이 없습니다. id=" + photoId));
+        return PhotoLocationResponseDto.builder()
+                .id(photo.getId())
+                .filePath(photo.getFilePath())
+                .latitude(photo.getLatitude())
+                .longitude(photo.getLongitude())
+                .build();
     }
 }
