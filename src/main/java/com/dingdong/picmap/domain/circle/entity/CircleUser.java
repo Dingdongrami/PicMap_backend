@@ -1,6 +1,7 @@
 package com.dingdong.picmap.domain.circle.entity;
 
 import com.dingdong.picmap.domain.user.entity.User;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,8 +26,17 @@ public class CircleUser {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder
     public CircleUser(Circle circle, User user) {
         this.circle = circle;
         this.user = user;
     }
+
+    public CircleUser toEntity(Circle circle, User user) {
+        return CircleUser.builder()
+                .circle(circle)
+                .user(user)
+                .build();
+    }
+
 }

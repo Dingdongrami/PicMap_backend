@@ -1,5 +1,7 @@
 package com.dingdong.picmap.config;
 
+import com.dingdong.picmap.config.jwt.JwtAccessDeniedHandler;
+import com.dingdong.picmap.config.jwt.JwtAuthenticationEntryPoint;
 import com.dingdong.picmap.config.jwt.JwtAuthenticationFilter;
 import com.dingdong.picmap.config.jwt.JwtTokenProvider;
 import com.dingdong.picmap.config.util.SecurityUtils;
@@ -27,6 +29,8 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final SecurityUtils securityUtils;
 
     @Bean
@@ -40,14 +44,20 @@ public class SecurityConfig {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                // CORS 설정
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .formLogin().disable()
                 .httpBasic().disable()
+                // request 권한 설정
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/api/user/**").permitAll()
+                .antMatchers("/api/user/signup", "/api/user/login").permitAll()
 //                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, securityUtils), UsernamePasswordAuthenticationFilter.class);
 
