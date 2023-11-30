@@ -5,9 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class PhotoUploadRequestDto {
+public class PhotoRequestDto {
 
-    private Double latitude;
-    private Double longitude;
-    private String shootingDate;
+    private Long userId;
+    private Long circleId;
 }

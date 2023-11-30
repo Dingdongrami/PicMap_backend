@@ -3,6 +3,7 @@ package com.dingdong.picmap.domain.photo.service;
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
+import com.dingdong.picmap.domain.photo.dto.PhotoRequestDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.entity.Photo;
@@ -31,7 +32,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -50,31 +50,25 @@ public class PhotoUploadService {
     private S3Uploader s3Uploader;
 
     @Transactional(rollbackFor = Exception.class)
-    public List<PhotoResponseDto> uploadPhoto(List<MultipartFile> images, PhotoUploadRequestDto requestDto) {
+    public List<PhotoResponseDto> uploadPhoto(List<PhotoUploadRequestDto> requestDtoList, PhotoRequestDto photoRequestDto, List<MultipartFile> images) {
         if (images.isEmpty()) {
             throw new IllegalArgumentException("이미지가 없습니다.");
         }
-        List<Photo> photoList = new ArrayList<>();
-        try {
-            User user = userRepository.findById(requestDto.getUserId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다. id=" + requestDto.getUserId()));
-            Circle circle = circleRepository.findById(requestDto.getCircleId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다. id=" + requestDto.getCircleId()));
+        User user = userRepository.findById(photoRequestDto.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+        Circle circle = circleRepository.findById(photoRequestDto.getCircleId())
+                .orElseThrow(() -> new EntityNotFoundException("써클을 찾을 수 없습니다."));
 
-            images.forEach(image -> {
-                String fileName = s3Uploader.upload(image, "images");
-                Photo photo = PhotoEntityMapper.toPhotoEntity(user, requestDto);
-                photo.setFilePath(fileName);
-                Photo savedPhoto = photoUploadRepository.save(photo);
-                photoList.add(savedPhoto);
-                circleSharedAlbumRepository.save(circleSharedAlbumMapper.createCircleSharedAlbum(savedPhoto, circle, user));
-            });
-        } catch (Exception e) {
-            log.error("사진 업로드 실패", e);
-            throw e;
+        List<Photo> savedPhotoList = new ArrayList<>();
+        for (int i = 0; i < images.size(); i++) {
+            String filePath = s3Uploader.upload(images.get(i), "images");
+            Photo photo = photoEntityMapper.toPhotoEntity(user, requestDtoList.get(i));
+            photo.setFilePath(filePath);
+            Photo savedPhoto = photoUploadRepository.save(photo);
+            savedPhotoList.add(savedPhoto);
+            circleSharedAlbumRepository.save(circleSharedAlbumMapper.toCircleSharedAlbumEntity(savedPhoto, circle, user));
         }
-
-        return PhotoResponseDto.listOf(photoList);
+        return PhotoResponseDto.listOf(savedPhotoList);
     }
 
     private File convert(MultipartFile image) throws IOException {

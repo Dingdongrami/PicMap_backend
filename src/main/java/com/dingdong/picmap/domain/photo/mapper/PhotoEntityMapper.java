@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class PhotoEntityMapper {
 
-    public static Photo toPhotoEntity(User user, PhotoUploadRequestDto requestDto) {
+    public Photo toPhotoEntity(User user, PhotoUploadRequestDto requestDto) {
         return Photo.builder()
                 .user(user)
                 .latitude(requestDto.getLatitude())
