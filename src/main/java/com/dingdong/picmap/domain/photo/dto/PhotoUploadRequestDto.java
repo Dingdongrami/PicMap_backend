@@ -9,4 +9,8 @@ public class PhotoUploadRequestDto {
 
     private Long userId;
     private Long circleId;
+
+    private Double latitude;
+    private Double longitude;
+    private String shootingDate;
 }
