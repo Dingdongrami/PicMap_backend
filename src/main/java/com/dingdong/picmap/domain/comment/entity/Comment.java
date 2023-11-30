@@ -1,4 +1,4 @@
-package com.dingdong.picmap.domain.like.entity;
+package com.dingdong.picmap.domain.comment.entity;
 
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import com.dingdong.picmap.domain.photo.entity.Photo;
@@ -7,14 +7,16 @@ import lombok.Getter;
 
 import javax.persistence.*;
 
-@Getter
 @Entity
-@Table(name = "likes")
-public class Like extends BaseTimeEntity {
+@Getter
+@Table(name = "comments")
+public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
