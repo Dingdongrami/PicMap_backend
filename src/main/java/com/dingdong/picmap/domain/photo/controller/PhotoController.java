@@ -1,6 +1,5 @@
 package com.dingdong.picmap.domain.photo.controller;
 
-import com.dingdong.picmap.domain.photo.dto.CameraPhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoLocationResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.service.PhotoService;
