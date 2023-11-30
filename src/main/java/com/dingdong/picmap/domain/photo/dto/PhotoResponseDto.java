@@ -18,16 +18,16 @@ public class PhotoResponseDto {
         this.filePath = filePath;
     }
 
-    public static PhotoResponseDto of(Long id, String filePath) {
+    public static PhotoResponseDto of(Photo photo) {
     	return PhotoResponseDto.builder()
-    			.id(id)
-    			.filePath(filePath)
+    			.id(photo.getId())
+    			.filePath(photo.getFilePath())
     			.build();
     }
 
      public static List<PhotoResponseDto> listOf(List<Photo> photos) {
          return photos.stream()
-                 .map(photo -> PhotoResponseDto.of(photo.getId(), photo.getFilePath()))
+                 .map(PhotoResponseDto::of)
                  .collect(Collectors.toList());
      }
 }

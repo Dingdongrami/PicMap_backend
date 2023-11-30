@@ -29,7 +29,7 @@ public class PhotoService {
 
     public PhotoResponseDto getPhotoByPhotoId(Long id) {
         Photo findPhoto = photoUploadRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 사진이 없습니다. id=" + id));
-        return PhotoResponseDto.of(findPhoto.getId(), findPhoto.getFilePath());
+        return PhotoResponseDto.of(findPhoto);
     }
 
     public List<PhotoResponseDto> getPhotosByUserId(Long userId) {

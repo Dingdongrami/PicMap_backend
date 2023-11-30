@@ -1,21 +1,28 @@
 package com.dingdong.picmap.domain.photo.controller;
 
+import com.dingdong.picmap.domain.photo.dto.PhotoRequestDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.service.PhotoDownloadService;
 import com.dingdong.picmap.domain.photo.service.PhotoUploadService;
 import com.dingdong.picmap.domain.photo.service.S3Uploader;
+import com.drew.lang.StreamUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/photos")
@@ -28,21 +35,21 @@ public class PhotoUploadController {
 
     // 사진 업로드
     @ResponseBody
-    @PostMapping(value = "/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<PhotoResponseDto>> uploadPhoto(HttpServletRequest httpServletRequest) throws Exception {
         if (!(httpServletRequest instanceof MultipartHttpServletRequest)) {
             throw new IllegalArgumentException("MultipartHttpServletRequest is not valid");
         }
 
         MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
-        List<MultipartFile> images = multipartHttpServletRequest.getFiles("image");
-        String jsonData = multipartHttpServletRequest.getParameter("jsonData");
-        try {
-            PhotoUploadRequestDto requestDto = objectMapper.readValue(jsonData, PhotoUploadRequestDto.class);
-            return ResponseEntity.ok(photoUploadService.uploadPhoto(images, requestDto));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        String[] photoInfoList = multipartHttpServletRequest.getParameterValues("photoInfoList");
+        String request = multipartHttpServletRequest.getParameter("jsonData");
+        List<MultipartFile> files = multipartHttpServletRequest.getFiles("images");
+
+        PhotoRequestDto photoRequestDto = objectMapper.readValue(request, PhotoRequestDto.class);
+        List<PhotoUploadRequestDto> requestDtoList = objectMapper.readValue(photoInfoList[0], new TypeReference<>() {});
+
+        return ResponseEntity.ok(photoUploadService.uploadPhoto(requestDtoList, photoRequestDto, files));
     }
 
     // 사진 다운로드
