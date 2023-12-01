@@ -3,14 +3,18 @@ package com.dingdong.picmap.domain.like.entity;
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.user.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Getter
 @Entity
 @Table(name = "likes")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Like extends BaseTimeEntity {
 
     @Id
