@@ -35,10 +35,10 @@ public class PhotoController {
         return ResponseEntity.ok(photoService.getPhotosByCircleId(circleId));
     }
 
-    @DeleteMapping("/{photoId}")
-    public ResponseEntity<String> deletePhoto(@PathVariable Long photoId) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deletePhoto(@RequestBody List<Long> photoIdList) {
         try {
-            return ResponseEntity.ok(photoService.deletePhoto(photoId));
+            return ResponseEntity.ok(photoService.deletePhoto(photoIdList));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

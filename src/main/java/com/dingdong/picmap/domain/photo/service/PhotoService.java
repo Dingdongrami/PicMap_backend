@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Slf4j
@@ -40,11 +41,12 @@ public class PhotoService {
     }
 
     @Transactional
-    public String deletePhoto(Long photoId) {
-        Photo photo = photoRepository.findById(photoId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사진이 없습니다. id=" + photoId));
-        photoRepository.delete(photo);
-        return photoId + " deleted";
+    public String deletePhoto(List<Long> photoIdList) {
+        photoIdList.stream()
+                .map(photoId -> photoRepository.findById(photoId)
+                        .orElseThrow(() -> new EntityNotFoundException("해당 사진이 없습니다.")))
+                .forEach(photoRepository::delete);
+        return "success";
     }
 
     public List<PhotoResponseDto> getPhotosByCircleId(Long circleId) {
