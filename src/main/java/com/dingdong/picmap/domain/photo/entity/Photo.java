@@ -44,6 +44,10 @@ public class Photo extends BaseTimeEntity {
     @ColumnDefault("0")
     private Integer likeCount;
 
+    @Column(name = "comment_count", nullable = false)
+    @ColumnDefault("0")
+    private Integer commentCount;
+
     public Photo(User user, String filePath) {
         this.user = user;
         this.filePath = filePath;
@@ -66,5 +70,9 @@ public class Photo extends BaseTimeEntity {
 
     public void setLikeCount(Integer likeCount) {
         this.likeCount = likeCount;
+    }
+
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
     }
 }

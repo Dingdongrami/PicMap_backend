@@ -40,6 +40,7 @@ public class LikeService {
                 .photo(photo)
                 .build();
         likeRepository.save(like);
+        photo.setLikeCount(photo.getLikeCount() + 1);
     }
 
     public void deleteLike(LikeRequestDto requestDto) {
@@ -50,6 +51,9 @@ public class LikeService {
         Like like = likeRepository.findByUserAndPhoto(user, photo).orElseThrow(
                 () -> new NotFoundException("해당 좋아요가 없습니다."));
         likeRepository.delete(like);
+        if (photo.getLikeCount() > 0) {
+            photo.setLikeCount(photo.getLikeCount() - 1);
+        }
     }
 
     // 좋아요 높은 순으로 사진 가져오기
