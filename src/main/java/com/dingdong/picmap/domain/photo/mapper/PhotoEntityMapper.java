@@ -17,7 +17,7 @@ public class PhotoEntityMapper {
                 .user(user)
                 .latitude(requestDto.getLatitude())
                 .longitude(requestDto.getLongitude())
-                .shootingDate(LocalDateTime.parse(requestDto.getShootingDate()))
+                .shootingDate(requestDto.getShootingDate() != null ? LocalDateTime.parse(requestDto.getShootingDate()) : null)
                 .build();
     }
 }
