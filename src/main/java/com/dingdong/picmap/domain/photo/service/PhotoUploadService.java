@@ -9,6 +9,7 @@ import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.mapper.PhotoEntityMapper;
 import com.dingdong.picmap.domain.photo.repository.PhotoUploadRepository;
+import com.dingdong.picmap.domain.photo.service.s3.S3Uploader;
 import com.dingdong.picmap.domain.sharedAlbum.mapper.CircleSharedAlbumMapper;
 import com.dingdong.picmap.domain.sharedAlbum.repository.CircleSharedAlbumRepository;
 import com.dingdong.picmap.domain.user.entity.User;

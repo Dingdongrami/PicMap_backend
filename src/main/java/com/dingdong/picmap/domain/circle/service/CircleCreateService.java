@@ -7,7 +7,7 @@ import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.entity.CircleUser;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
-import com.dingdong.picmap.domain.photo.service.S3Uploader;
+import com.dingdong.picmap.domain.photo.service.s3.S3Uploader;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

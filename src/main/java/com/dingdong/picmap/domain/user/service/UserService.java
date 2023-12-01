@@ -4,7 +4,7 @@ import com.dingdong.picmap.config.jwt.JwtToken;
 import com.dingdong.picmap.config.jwt.JwtTokenProvider;
 import com.dingdong.picmap.config.util.RedisUtils;
 import com.dingdong.picmap.config.util.SecurityUtils;
-import com.dingdong.picmap.domain.photo.service.S3Uploader;
+import com.dingdong.picmap.domain.photo.service.s3.S3Uploader;
 import com.dingdong.picmap.domain.user.dto.request.LoginRequestDto;
 import com.dingdong.picmap.domain.user.dto.request.SignupRequestDto;
 import com.dingdong.picmap.domain.user.dto.request.UserUpdateRequestDto;
