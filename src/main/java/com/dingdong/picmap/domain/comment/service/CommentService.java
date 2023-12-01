@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -39,4 +41,15 @@ public class CommentService {
         return new CommentResponseDto(savedComment);
     }
 
+    public List<CommentResponseDto> getCommentList(Long photoId) {
+        Photo photo = photoRepository.findById(photoId).orElseThrow(
+                () -> new EntityNotFoundException("해당 사진이 없습니다."));
+        List<Comment> commentList = commentRepository.findAllByPhoto(photo);
+
+        // 댓글 최신순 정렬
+        commentList.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
+        return commentList.stream()
+                .map(CommentResponseDto::new)
+                .collect(Collectors.toList());
+    }
 }
