@@ -48,4 +48,11 @@ public class UserController {
     public ResponseEntity<UserProfileUpdateResponseDto> updateProfile(@PathVariable Long userId, @RequestPart(name = "profile") MultipartFile profileImage) {
         return ResponseEntity.ok(userService.updateProfile(userId, profileImage));
     }
+
+    // 기본 프로필 이미지 설정
+    @PutMapping("/{userId}/no-profile")
+    public ResponseEntity<UserProfileUpdateResponseDto> updateNoProfile(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.updateNoProfile(userId));
+    }
+
 }

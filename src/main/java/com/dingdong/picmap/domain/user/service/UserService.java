@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.util.Collections;
@@ -53,7 +54,7 @@ public class UserService {
         final String requestPassword = loginRequestDto.getPassword();
 
         User user = userRepository.findByEmail(requestEmail)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
         userValidateService.validatePassword(requestPassword, user);
         Authentication authentication = securityUtils.setAuthentication(requestEmail, requestPassword);
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
@@ -62,23 +63,30 @@ public class UserService {
     }
 
     public UserResponseDto getUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
         return new UserResponseDto(user);
     }
 
 
     @Transactional
     public UserUpdateResponseDto update(Long userId, UserUpdateRequestDto userUpdateRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
         user.update(userUpdateRequestDto.getNickname(), userUpdateRequestDto.getIntroduce(), userUpdateRequestDto.getStatus());
         return new UserUpdateResponseDto(user);
     }
 
     @Transactional
     public UserProfileUpdateResponseDto updateProfile(Long userId, MultipartFile profileImage) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
         String profileImageUrl = s3Uploader.upload(profileImage, "profile");
         user.updateProfile(profileImageUrl);
         return new UserProfileUpdateResponseDto(user.getId(), profileImageUrl);
+    }
+
+    @Transactional
+    public UserProfileUpdateResponseDto updateNoProfile(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
+        user.updateProfile(null);
+        return new UserProfileUpdateResponseDto(user.getId(), null);
     }
 }
