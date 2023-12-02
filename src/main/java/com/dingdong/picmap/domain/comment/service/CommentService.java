@@ -32,11 +32,7 @@ public class CommentService {
         Photo photo = photoRepository.findById(requestDto.getPhotoId()).orElseThrow(
                 () -> new EntityNotFoundException("해당 사진이 없습니다."));
 
-        Comment comment = Comment.builder()
-                .comment(requestDto.getComment())
-                .user(user)
-                .photo(photo)
-                .build();
+        Comment comment = Comment.of(requestDto.getComment(), user, photo);
         Comment savedComment = commentRepository.save(comment);
         photo.setCommentCount(photo.getCommentCount() + 1);
         return new CommentResponseDto(savedComment);

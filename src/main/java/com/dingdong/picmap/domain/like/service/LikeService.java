@@ -35,10 +35,7 @@ public class LikeService {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다.");
         }
 
-        Like like = Like.builder()
-                .user(user)
-                .photo(photo)
-                .build();
+        Like like = Like.of(user, photo);
         likeRepository.save(like);
         photo.setLikeCount(photo.getLikeCount() + 1);
     }

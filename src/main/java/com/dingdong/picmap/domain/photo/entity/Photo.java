@@ -1,6 +1,8 @@
 package com.dingdong.picmap.domain.photo.entity;
 
+import com.dingdong.picmap.domain.comment.entity.Comment;
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
+import com.dingdong.picmap.domain.like.entity.Like;
 import com.dingdong.picmap.domain.user.entity.User;
 import jdk.jshell.Snippet;
 import lombok.AllArgsConstructor;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Table(name = "photos")
@@ -47,6 +50,12 @@ public class Photo extends BaseTimeEntity {
     @Column(name = "comment_count", nullable = false)
     @ColumnDefault("0")
     private Integer commentCount;
+
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL)
+    private List<Like> likes;
+
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
     public Photo(User user, String filePath) {
         this.user = user;

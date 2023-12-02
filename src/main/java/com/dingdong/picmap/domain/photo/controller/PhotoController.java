@@ -23,16 +23,28 @@ public class PhotoController {
         return ResponseEntity.ok(photoService.getPhotoByPhotoId(photoId));
     }
 
-    // user id 로 사진 리스트 조회
+    // user id 로 사진 리스트 조회(유저가 올린 사진)
     @GetMapping("/get/user/{userId}")
-    public ResponseEntity<List<PhotoResponseDto>> getPhotoByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoListByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(photoService.getPhotosByUserId(userId));
     }
 
     // circle id 로 사진 리스트 조회
     @GetMapping("/get/circle/{circleId}")
-    public ResponseEntity<List<PhotoResponseDto>> getPhotoByCircleId(@PathVariable Long circleId) {
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoListByCircleId(@PathVariable Long circleId) {
         return ResponseEntity.ok(photoService.getPhotosByCircleId(circleId));
+    }
+
+    // userId 가 속한 PUBLIC 써클의 사진 리스트 조회
+    @GetMapping("/get/public/{userId}")
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoListByPublicCircleByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(photoService.getPhotosByPublicCircleByUserId(userId));
+    }
+
+    // userId 가 속한 전체 써클의 사진 리스트 조회
+    @GetMapping("/get/all-circle/{userId}")
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoListByAllCirclesByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(photoService.getPhotosByAllCirclesByUserId(userId));
     }
 
     @DeleteMapping("/delete")
