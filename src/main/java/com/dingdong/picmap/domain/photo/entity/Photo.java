@@ -4,18 +4,18 @@ import com.dingdong.picmap.domain.comment.entity.Comment;
 import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import com.dingdong.picmap.domain.like.entity.Like;
 import com.dingdong.picmap.domain.user.entity.User;
-import jdk.jshell.Snippet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@DynamicInsert
 @Getter
 @Table(name = "photos")
 @Entity
@@ -43,12 +43,10 @@ public class Photo extends BaseTimeEntity {
     private Double latitude;
     private Double longitude;
 
-    @Column(name = "like_count", nullable = false)
-    @ColumnDefault("0")
+    @Column(name = "like_count")
     private Integer likeCount;
 
-    @Column(name = "comment_count", nullable = false)
-    @ColumnDefault("0")
+    @Column(name = "comment_count")
     private Integer commentCount;
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL)
