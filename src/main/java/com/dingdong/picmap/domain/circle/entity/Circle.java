@@ -47,4 +47,8 @@ public class Circle {
         this.description = circle.getDescription();
         this.status = circle.getStatus();
     }
+
+    public boolean getIsPublic() {
+        return this.status.equals("PUBLIC");
+    }
 }
