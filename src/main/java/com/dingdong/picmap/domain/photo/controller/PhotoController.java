@@ -2,6 +2,7 @@ package com.dingdong.picmap.domain.photo.controller;
 
 import com.dingdong.picmap.domain.photo.dto.PhotoLocationResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
+import com.dingdong.picmap.domain.photo.dto.PhotoSortRequestDto;
 import com.dingdong.picmap.domain.photo.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,5 +60,11 @@ public class PhotoController {
     @GetMapping("{photoId}/location")
     public ResponseEntity<PhotoLocationResponseDto> getLocation(@PathVariable Long photoId) {
         return ResponseEntity.ok(photoService.getLocation(photoId));
+    }
+
+    // 사진 정렬 - 최신 순, 오래된 순, 좋아요 많은 순
+    @GetMapping("/sort")
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoListBySort(@RequestBody PhotoSortRequestDto requestDto) {
+        return ResponseEntity.ok(photoService.getPhotosBySort(requestDto));
     }
 }
