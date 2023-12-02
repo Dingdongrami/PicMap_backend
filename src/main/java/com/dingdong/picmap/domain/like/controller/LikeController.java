@@ -14,16 +14,24 @@ public class LikeController {
     private final LikeService likeService;
 
     // 좋아요 추가
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<?> addLike(@RequestBody LikeRequestDto requestDto) {
-        likeService.addLike(requestDto);
-        return ResponseEntity.ok().build();
+        try {
+            likeService.addLike(requestDto);
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // 좋아요 취소
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<?> deleteLike(@RequestBody LikeRequestDto requestDto) {
-        likeService.deleteLike(requestDto);
-        return ResponseEntity.ok().build();
+        try {
+            likeService.deleteLike(requestDto);
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
