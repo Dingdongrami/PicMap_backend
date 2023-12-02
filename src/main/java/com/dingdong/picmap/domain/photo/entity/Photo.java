@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -39,17 +40,24 @@ public class Photo extends BaseTimeEntity {
     private Double latitude;
     private Double longitude;
 
+    @Column(name = "like_count", nullable = false)
+    @ColumnDefault("0")
+    private Integer likeCount;
+
+    @Column(name = "comment_count", nullable = false)
+    @ColumnDefault("0")
+    private Integer commentCount;
+
     public Photo(User user, String filePath) {
         this.user = user;
         this.filePath = filePath;
     }
 
-    //== file path 설정 메서드 ==//
+    //== 설정 메서드 ==//
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
-    //== metadata 설정 메서드 ==//
     public void setMetaData(Double latitude, Double longitude, LocalDateTime shootingDate) {
         this.latitude = latitude;
         this.longitude = longitude;
@@ -58,5 +66,13 @@ public class Photo extends BaseTimeEntity {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
     }
 }

@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.photo.service;
 
+import com.dingdong.picmap.domain.photo.service.s3.S3Downloader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

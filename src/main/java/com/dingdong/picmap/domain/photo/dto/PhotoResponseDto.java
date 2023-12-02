@@ -1,21 +1,22 @@
 package com.dingdong.picmap.domain.photo.dto;
 
 import com.dingdong.picmap.domain.photo.entity.Photo;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PhotoResponseDto {
-    private final Long id;
-    private final String filePath;
+    private Long id;
+    private String filePath;
 
-    @Builder
-    public PhotoResponseDto(Long id, String filePath) {
-        this.id = id;
-        this.filePath = filePath;
+    public PhotoResponseDto(Photo photo) {
+        this.id = photo.getId();
+        this.filePath = photo.getFilePath();
     }
 
     public static PhotoResponseDto of(Photo photo) {
