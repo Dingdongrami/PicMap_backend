@@ -103,3 +103,7 @@ jobs:
             sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/picmap
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/picmap
             sudo docker run -it -d -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/picmap
+
+      # remove GitHub IP from AWS
+      - name: Remove GitHub IP from AWS
+        run: aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
