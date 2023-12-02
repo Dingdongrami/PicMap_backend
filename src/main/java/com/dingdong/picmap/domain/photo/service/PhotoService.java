@@ -3,8 +3,10 @@ package com.dingdong.picmap.domain.photo.service;
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
+import com.dingdong.picmap.domain.global.BaseTimeEntity;
 import com.dingdong.picmap.domain.photo.dto.PhotoLocationResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
+import com.dingdong.picmap.domain.photo.dto.PhotoSortRequestDto;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.repository.PhotoRepository;
 import com.dingdong.picmap.domain.photo.repository.PhotoUploadRepository;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,5 +103,37 @@ public class PhotoService {
                 .latitude(photo.getLatitude())
                 .longitude(photo.getLongitude())
                 .build();
+    }
+
+    public List<PhotoResponseDto> getPhotosBySort(PhotoSortRequestDto requestDto) {
+        Circle circle = circleRepository.findById(requestDto.getCircleId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
+        List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
+        switch (requestDto.getSortType()) {
+            case "latest":
+                findPhotos.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
+                break;
+            case "oldest":
+                findPhotos.sort(Comparator.comparing(BaseTimeEntity::getCreatedDate));
+                break;
+            case "like":
+                findPhotos.sort((o1, o2) -> o2.getLikeCount().compareTo(o1.getLikeCount()));
+                break;
+            default:
+                throw new IllegalArgumentException("잘못된 정렬 방식입니다.");
+        }
+        return PhotoResponseDto.listOf(findPhotos);
+    }
+
+    public List<PhotoResponseDto> getLatestPhotosByCircleId(Long circleId) {
+        Circle circle = circleRepository.findById(circleId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
+        List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
+        findPhotos.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
+
+        if (findPhotos.size() >= 4) {
+            return PhotoResponseDto.listOf(findPhotos.subList(0, 4));
+        }
+        return PhotoResponseDto.listOf(findPhotos);
     }
 }
