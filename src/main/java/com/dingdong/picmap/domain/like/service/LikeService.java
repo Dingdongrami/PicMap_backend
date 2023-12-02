@@ -55,13 +55,4 @@ public class LikeService {
             photo.setLikeCount(photo.getLikeCount() - 1);
         }
     }
-
-    // 좋아요 높은 순으로 사진 가져오기
-    public List<PhotoResponseDto> getPhotoListOrderByLikeCountDesc() {
-        List<Photo> photoList = photoRepository.findAllByOrderByLikeCountDesc();
-        List<PhotoResponseDto> photoResponseDtoList = photoList.stream()
-                .map(PhotoResponseDto::new)
-                .collect(Collectors.toList());
-        return photoResponseDtoList;
-    }
 }
