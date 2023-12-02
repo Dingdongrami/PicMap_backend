@@ -38,6 +38,16 @@ public class Comment extends BaseTimeEntity {
         this.photo = photo;
     }
 
+    public static Comment of(String comment, User user, Photo photo) {
+        Comment newComment = Comment.builder()
+                .comment(comment)
+                .user(user)
+                .photo(photo)
+                .build();
+        photo.getComments().add(newComment);
+        return newComment;
+    }
+
     public void update(String comment) {
         this.comment = comment;
     }

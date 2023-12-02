@@ -2,11 +2,13 @@ package com.dingdong.picmap.domain.photo.service;
 
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
+import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
 import com.dingdong.picmap.domain.photo.dto.PhotoLocationResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.entity.Photo;
 import com.dingdong.picmap.domain.photo.repository.PhotoRepository;
 import com.dingdong.picmap.domain.photo.repository.PhotoUploadRepository;
+import com.dingdong.picmap.domain.sharedAlbum.repository.CircleSharedAlbumRepository;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,6 +30,7 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final UserRepository userRepository;
     private final CircleRepository circleRepository;
+    private final CircleSharedAlbumRepository circleSharedAlbumRepository;
 
     public PhotoResponseDto getPhotoByPhotoId(Long id) {
         Photo findPhoto = photoUploadRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 사진이 없습니다. id=" + id));
@@ -45,7 +49,10 @@ public class PhotoService {
         photoIdList.stream()
                 .map(photoId -> photoRepository.findById(photoId)
                         .orElseThrow(() -> new EntityNotFoundException("해당 사진이 없습니다.")))
-                .forEach(photoRepository::delete);
+                .forEach(photo -> {
+                    circleSharedAlbumRepository.deleteByPhoto(photo);
+                    photoRepository.delete(photo);
+                });
         return "success";
     }
 

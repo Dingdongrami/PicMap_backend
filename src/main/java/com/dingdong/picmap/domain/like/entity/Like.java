@@ -34,4 +34,13 @@ public class Like extends BaseTimeEntity {
         this.user = user;
         this.photo = photo;
     }
+
+    public static Like of(User user, Photo photo) {
+        Like like = Like.builder()
+                .user(user)
+                .photo(photo)
+                .build();
+        photo.getLikes().add(like);
+        return like;
+    }
 }
