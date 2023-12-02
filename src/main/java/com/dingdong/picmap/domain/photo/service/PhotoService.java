@@ -124,4 +124,16 @@ public class PhotoService {
         }
         return PhotoResponseDto.listOf(findPhotos);
     }
+
+    public List<PhotoResponseDto> getLatestPhotosByCircleId(Long circleId) {
+        Circle circle = circleRepository.findById(circleId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
+        List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
+        findPhotos.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
+
+        if (findPhotos.size() >= 4) {
+            return PhotoResponseDto.listOf(findPhotos.subList(0, 4));
+        }
+        return PhotoResponseDto.listOf(findPhotos);
+    }
 }

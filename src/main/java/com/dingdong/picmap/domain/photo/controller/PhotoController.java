@@ -62,9 +62,16 @@ public class PhotoController {
         return ResponseEntity.ok(photoService.getLocation(photoId));
     }
 
-    // 사진 정렬 - 최신 순, 오래된 순, 좋아요 많은 순
+    // 사진 정렬 - 최신 순(latest), 오래된 순(oldest), 좋아요 많은 순(like)
     @GetMapping("/sort")
     public ResponseEntity<List<PhotoResponseDto>> getPhotoListBySort(@RequestBody PhotoSortRequestDto requestDto) {
         return ResponseEntity.ok(photoService.getPhotosBySort(requestDto));
     }
+
+    // 써클의 최신 사진 4장 조회
+    @GetMapping("/latest-four")
+    public ResponseEntity<List<PhotoResponseDto>> getLatestPhotosByCircleId(@RequestParam Long circleId) {
+        return ResponseEntity.ok(photoService.getLatestPhotosByCircleId(circleId));
+    }
+
 }
