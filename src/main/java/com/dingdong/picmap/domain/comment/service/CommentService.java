@@ -2,6 +2,7 @@ package com.dingdong.picmap.domain.comment.service;
 
 import com.dingdong.picmap.domain.comment.dto.CommentRequestDto;
 import com.dingdong.picmap.domain.comment.dto.CommentResponseDto;
+import com.dingdong.picmap.domain.comment.dto.CommentUpdateRequestDto;
 import com.dingdong.picmap.domain.comment.entity.Comment;
 import com.dingdong.picmap.domain.comment.repository.CommentRepository;
 import com.dingdong.picmap.domain.photo.entity.Photo;
@@ -52,4 +53,22 @@ public class CommentService {
                 .map(CommentResponseDto::new)
                 .collect(Collectors.toList());
     }
+
+    public CommentResponseDto updateComment(CommentUpdateRequestDto requestDto) {
+        Comment comment = commentRepository.findById(requestDto.getCommentId()).orElseThrow(
+                () -> new EntityNotFoundException("해당 댓글이 없습니다."));
+        comment.update(requestDto.getComment());
+        return new CommentResponseDto(comment);
+    }
+
+    public String deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new EntityNotFoundException("해당 댓글이 없습니다."));
+        commentRepository.delete(comment);
+        if (comment.getPhoto().getCommentCount() > 0) {
+            comment.getPhoto().setCommentCount(comment.getPhoto().getCommentCount() - 1);
+        }
+        return "success";
+    }
+
 }

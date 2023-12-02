@@ -2,6 +2,7 @@ package com.dingdong.picmap.domain.comment.controller;
 
 import com.dingdong.picmap.domain.comment.dto.CommentRequestDto;
 import com.dingdong.picmap.domain.comment.dto.CommentResponseDto;
+import com.dingdong.picmap.domain.comment.dto.CommentUpdateRequestDto;
 import com.dingdong.picmap.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,18 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentList(photoId));
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<CommentResponseDto> updateComment(@RequestBody CommentUpdateRequestDto requestDto) {
+        return ResponseEntity.ok(commentService.updateComment(requestDto));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteComment(@RequestParam Long commentId) {
+        try {
+            return ResponseEntity.ok(commentService.deleteComment(commentId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }
