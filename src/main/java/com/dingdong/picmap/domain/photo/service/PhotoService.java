@@ -91,6 +91,7 @@ public class PhotoService {
         Circle circle = circleRepository.findById(circleId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
         List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
+        findPhotos.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
         return PhotoResponseDto.listOf(findPhotos);
     }
 
