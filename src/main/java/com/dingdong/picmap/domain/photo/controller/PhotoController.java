@@ -57,13 +57,13 @@ public class PhotoController {
         }
     }
 
-    @GetMapping("{photoId}/location")
+    @GetMapping("/{photoId}/location")
     public ResponseEntity<PhotoLocationResponseDto> getLocation(@PathVariable Long photoId) {
         return ResponseEntity.ok(photoService.getLocation(photoId));
     }
 
     // 사진 정렬 - 최신 순(latest), 오래된 순(oldest), 좋아요 많은 순(like)
-    @GetMapping("/sort")
+    @PostMapping("/sort")
     public ResponseEntity<List<PhotoResponseDto>> getPhotoListBySort(@RequestBody PhotoSortRequestDto requestDto) {
         return ResponseEntity.ok(photoService.getPhotosBySort(requestDto));
     }
