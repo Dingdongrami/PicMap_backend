@@ -63,9 +63,9 @@ public class CircleController extends BaseTimeEntity {
     }
 
     // 써클 수정
-    @PutMapping("/update")
-    public ResponseEntity<CircleResponseDto> updateCircle(@RequestBody CircleRequestDto circleRequestDto) {
-        return ResponseEntity.ok(circleService.updateCircle(circleRequestDto));
+    @PutMapping("/update/{circleId}")
+    public ResponseEntity<CircleResponseDto> updateCircle(@PathVariable Long circleId, @RequestBody String name) {
+        return ResponseEntity.ok(circleService.updateCircleName(circleId, name));
     }
 
     // 써클 멤버 조회

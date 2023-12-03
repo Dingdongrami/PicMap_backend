@@ -51,4 +51,8 @@ public class Circle {
     public boolean getIsPublic() {
         return this.status.equals("PUBLIC");
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }

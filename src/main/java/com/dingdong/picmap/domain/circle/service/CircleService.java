@@ -51,10 +51,9 @@ public class CircleService {
     }
 
     @Transactional
-    public CircleResponseDto updateCircle(CircleRequestDto circleRequestDto) {
-        Circle circle = circleRepository.findById(circleRequestDto.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
-        Circle requestCircle = circleEntityMapper.toCircleEntity(circleRequestDto);
-        circle.update(requestCircle);
+    public CircleResponseDto updateCircleName(Long circleId, String name) {
+        Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        circle.updateName(name);
         return new CircleResponseDto(circle);
     }
 
