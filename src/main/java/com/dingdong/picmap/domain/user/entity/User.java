@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.user.entity;
 
+import com.dingdong.picmap.domain.friendship.entity.Friendship;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,7 +46,14 @@ public class User implements UserDetails {
 
     private String status;  // PUBLIC, PRIVATE
 
-    @ElementCollection(fetch = FetchType.EAGER) // roles collection
+    @OneToMany(mappedBy = "requester")
+    private List<Friendship> requestedFriendships;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Friendship> receivedFriendships;
+
+    // 사용자 권한
+    @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
