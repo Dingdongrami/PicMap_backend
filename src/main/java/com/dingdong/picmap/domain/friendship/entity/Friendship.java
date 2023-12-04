@@ -1,12 +1,19 @@
 package com.dingdong.picmap.domain.friendship.entity;
 
 import com.dingdong.picmap.domain.user.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Builder
 @Entity
 @Getter
+@Table(name = "friendship")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Friendship {
 
     @Id
@@ -23,4 +30,16 @@ public class Friendship {
 
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status;
+
+    public Friendship(User requester, User receiver) {
+        this.requester = requester;
+        this.receiver = receiver;
+        this.status = FriendshipStatus.REQUESTED;
+    }
+
+    // 친구인 경우 true 반환
+    public boolean isFriend() {
+        return this.status == FriendshipStatus.ACCEPTED;
+    }
+
 }

@@ -46,11 +46,8 @@ public class User implements UserDetails {
 
     private String status;  // PUBLIC, PRIVATE
 
-    @OneToMany(mappedBy = "requester")
-    private List<Friendship> requestedFriendships;
-
-    @OneToMany(mappedBy = "receiver")
-    private List<Friendship> receivedFriendships;
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
+    private List<Friendship> receivedFriendships;   // 친구 요청 받은 목록
 
     // 사용자 권한
     @ElementCollection(fetch = FetchType.EAGER)
