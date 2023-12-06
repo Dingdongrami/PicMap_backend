@@ -1,7 +1,7 @@
 package com.dingdong.picmap.domain.circle.controller;
 
 import com.dingdong.picmap.domain.circle.dto.request.CircleCreateRequestDto;
-import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
+import com.dingdong.picmap.domain.circle.dto.request.CircleJoinRequestDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleUserResponseDto;
 import com.dingdong.picmap.domain.circle.service.CircleCreateService;
@@ -48,6 +48,12 @@ public class CircleController extends BaseTimeEntity {
     @PostMapping("/{circleId}/add-thumbnail")
     public ResponseEntity<CircleResponseDto> addThumbnail(@PathVariable Long circleId, @RequestPart("thumbnail") MultipartFile file) throws IOException {
         return ResponseEntity.ok(circleCreateService.addThumbnail(circleId, file));
+    }
+
+    // 비공개 써클 가입
+    @PostMapping("/private-join")
+    public ResponseEntity<String> privateCircleJoin(@RequestBody CircleJoinRequestDto requestDto) {
+        return ResponseEntity.ok(circleCreateService.privateCircleJoin(requestDto));
     }
 
     // 써클 조회
