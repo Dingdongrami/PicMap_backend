@@ -4,6 +4,8 @@ import com.dingdong.picmap.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 public class UserResponseDto {
@@ -14,6 +16,19 @@ public class UserResponseDto {
     private String profileImage;
     private String introduce;
     private String status;
+    private List<FriendsResponseDto> requestList;
+    private List<FriendsResponseDto> friends;
+
+    public UserResponseDto(User user, List<FriendsResponseDto> requestList, List<FriendsResponseDto> friends) {
+        this.id = user.getId();
+        this.nickname = user.getNickname();
+        this.email = user.getEmail();
+        this.profileImage = user.getProfileImage();
+        this.introduce = user.getIntroduce();
+        this.status = user.getStatus();
+        this.requestList = requestList;
+        this.friends = friends;
+    }
 
     public UserResponseDto(User user) {
         this.id = user.getId();
@@ -23,5 +38,4 @@ public class UserResponseDto {
         this.introduce = user.getIntroduce();
         this.status = user.getStatus();
     }
-
 }

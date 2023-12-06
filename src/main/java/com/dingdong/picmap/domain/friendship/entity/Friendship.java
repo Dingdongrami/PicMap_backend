@@ -42,4 +42,11 @@ public class Friendship {
         return this.status == FriendshipStatus.ACCEPTED;
     }
 
+    public void accept() {
+        this.status = FriendshipStatus.ACCEPTED;
+    }
+
+    public boolean isAccepted() {
+        return this.status == FriendshipStatus.ACCEPTED;
+    }
 }

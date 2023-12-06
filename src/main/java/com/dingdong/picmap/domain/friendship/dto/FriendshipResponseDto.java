@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -22,5 +25,11 @@ public class FriendshipResponseDto {
         this.requesterId = friendship.getRequester().getId();
         this.receiverId = friendship.getReceiver().getId();
         this.status = friendship.getStatus().toString();
+    }
+
+    public static List<FriendshipResponseDto> listOf(List<Friendship> friendships) {
+        return friendships.stream()
+                .map(FriendshipResponseDto::new)
+                .collect(Collectors.toList());
     }
 }
