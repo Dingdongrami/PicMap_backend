@@ -4,10 +4,13 @@ import com.dingdong.picmap.config.jwt.JwtToken;
 import com.dingdong.picmap.config.jwt.JwtTokenProvider;
 import com.dingdong.picmap.config.util.RedisUtils;
 import com.dingdong.picmap.config.util.SecurityUtils;
+import com.dingdong.picmap.domain.friendship.entity.Friendship;
+import com.dingdong.picmap.domain.friendship.repository.FriendshipRepository;
 import com.dingdong.picmap.domain.photo.service.s3.S3Uploader;
 import com.dingdong.picmap.domain.user.dto.request.LoginRequestDto;
 import com.dingdong.picmap.domain.user.dto.request.SignupRequestDto;
 import com.dingdong.picmap.domain.user.dto.request.UserUpdateRequestDto;
+import com.dingdong.picmap.domain.user.dto.response.FriendsResponseDto;
 import com.dingdong.picmap.domain.user.dto.response.UserProfileUpdateResponseDto;
 import com.dingdong.picmap.domain.user.dto.response.UserResponseDto;
 import com.dingdong.picmap.domain.user.dto.response.UserUpdateResponseDto;
@@ -24,6 +27,8 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,6 +42,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserValidateService userValidateService;
     private final S3Uploader s3Uploader;
+    private final FriendshipRepository friendshipRepository;
 
     public Long signup(SignupRequestDto signupRequestDto) {
         User user = User.builder()
@@ -64,7 +70,17 @@ public class UserService {
 
     public UserResponseDto getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
-        return new UserResponseDto(user);
+
+        List<Friendship> allFriendshipByUser = friendshipRepository.findAllFriendshipByUser(user);
+        List<FriendsResponseDto> requestList = allFriendshipByUser.stream()
+                .filter(friendship -> !friendship.isAccepted())
+                .map(FriendsResponseDto::new)
+                .collect(Collectors.toList());
+        List<FriendsResponseDto> friendsList = allFriendshipByUser.stream()
+                .filter(Friendship::isAccepted)
+                .map(FriendsResponseDto::new)
+                .collect(Collectors.toList());
+        return new UserResponseDto(user, requestList, friendsList);
     }
 
 
