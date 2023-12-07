@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -51,16 +50,15 @@ public class CircleService {
     }
 
     @Transactional
-    public CircleResponseDto updateCircle(CircleRequestDto circleRequestDto) {
-        Circle circle = circleRepository.findById(circleRequestDto.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
-        Circle requestCircle = circleEntityMapper.toCircleEntity(circleRequestDto);
-        circle.update(requestCircle);
+    public CircleResponseDto updateCircleName(Long circleId, String name) {
+        Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
+        circle.updateName(name);
         return new CircleResponseDto(circle);
     }
 
     public CircleUserResponseDto getCircleMembers(Long circleId) {
         Circle circle = circleRepository.findById(circleId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
-        List<User> users = circleUserRepository.findUsersByTeam(circle);
+        List<User> users = circleUserRepository.findUsersByCircle(circle);
         List<UserResponseDto> userResponseDtoList = users.stream()
                 .map(UserResponseDto::new)
                 .collect(Collectors.toList());

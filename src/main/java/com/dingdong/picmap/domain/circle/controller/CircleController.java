@@ -1,7 +1,7 @@
 package com.dingdong.picmap.domain.circle.controller;
 
 import com.dingdong.picmap.domain.circle.dto.request.CircleCreateRequestDto;
-import com.dingdong.picmap.domain.circle.dto.request.CircleRequestDto;
+import com.dingdong.picmap.domain.circle.dto.request.CircleJoinRequestDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleResponseDto;
 import com.dingdong.picmap.domain.circle.dto.response.CircleUserResponseDto;
 import com.dingdong.picmap.domain.circle.service.CircleCreateService;
@@ -50,6 +50,12 @@ public class CircleController extends BaseTimeEntity {
         return ResponseEntity.ok(circleCreateService.addThumbnail(circleId, file));
     }
 
+    // 비공개 써클 가입
+    @PostMapping("/private-join")
+    public ResponseEntity<String> privateCircleJoin(@RequestBody CircleJoinRequestDto requestDto) {
+        return ResponseEntity.ok(circleCreateService.privateCircleJoin(requestDto));
+    }
+
     // 써클 조회
     @GetMapping("/{circleId}")
     public ResponseEntity<CircleResponseDto> getCircle(@PathVariable Long circleId) {
@@ -63,9 +69,9 @@ public class CircleController extends BaseTimeEntity {
     }
 
     // 써클 수정
-    @PutMapping("/update")
-    public ResponseEntity<CircleResponseDto> updateCircle(@RequestBody CircleRequestDto circleRequestDto) {
-        return ResponseEntity.ok(circleService.updateCircle(circleRequestDto));
+    @PutMapping("/update/{circleId}")
+    public ResponseEntity<CircleResponseDto> updateCircle(@PathVariable Long circleId, @RequestBody String name) {
+        return ResponseEntity.ok(circleService.updateCircleName(circleId, name));
     }
 
     // 써클 멤버 조회

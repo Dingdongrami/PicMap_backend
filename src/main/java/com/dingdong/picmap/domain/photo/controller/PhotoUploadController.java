@@ -5,21 +5,18 @@ import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.photo.dto.PhotoUploadRequestDto;
 import com.dingdong.picmap.domain.photo.service.PhotoDownloadService;
 import com.dingdong.picmap.domain.photo.service.PhotoUploadService;
-import com.dingdong.picmap.domain.photo.service.S3Uploader;
-import com.drew.lang.StreamUtil;
+import com.dingdong.picmap.domain.photo.service.s3.S3Uploader;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
