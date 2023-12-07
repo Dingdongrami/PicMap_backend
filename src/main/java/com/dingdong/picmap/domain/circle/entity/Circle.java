@@ -19,7 +19,7 @@ public class Circle {
     private Long id;
     private String name;
     private String description;
-    private String status;  // PUBLIC, PRIVATE
+    private String status;  // PUBLIC, PRIVATE, GOVERNMENT
     private String thumbnail;
 
     @Builder
