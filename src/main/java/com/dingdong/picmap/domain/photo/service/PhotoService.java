@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.photo.service;
 
+import com.dingdong.picmap.config.util.MeasureExecutionTime;
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,13 +43,29 @@ public class PhotoService {
         return PhotoResponseDto.of(findPhoto);
     }
 
+    @MeasureExecutionTime
     public List<PhotoResponseDto> getPhotosByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
-        List<Photo> findPhotos = photoUploadRepository.findAllByUserId(user);
-        return PhotoResponseDto.listOf(findPhotos);
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            CompletableFuture<List<Photo>> photoListFuture = CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByUserId(user), executorService);
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(photoListFuture);
+            allOf.get();
+
+            List<PhotoResponseDto> photoResponseDtoList = photoListFuture.get().stream()
+                    .map(PhotoResponseDto::of)
+                    .collect(Collectors.toList());
+            executorService.shutdown();
+            return photoResponseDtoList;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("error: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
+    @MeasureExecutionTime
     public List<PhotoResponseDto> getPhotosByPublicCircleByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
@@ -55,24 +73,53 @@ public class PhotoService {
                 .stream()
                 .filter(Circle::getIsPublic)
                 .collect(Collectors.toList());
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            List<CompletableFuture<List<Photo>>> futures = publicCircles.stream()
+                    .map(circle -> CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircleId(circle), executorService))
+                    .collect(Collectors.toList());
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            allOf.get();
 
-        List<Photo> publicCirclesAllPhotos = publicCircles.stream()
-                .map(circleSharedAlbumRepository::findAllByCircle)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-
-        return PhotoResponseDto.listOf(publicCirclesAllPhotos);
+            List<PhotoResponseDto> photoResponseDtoList = futures.stream()
+                    .map(CompletableFuture::join)
+                    .flatMap(List::stream)
+                    .map(PhotoResponseDto::of)
+                    .collect(Collectors.toList());
+            executorService.shutdown();
+            return photoResponseDtoList;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("error: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public List<PhotoResponseDto> getPhotosByAllCirclesByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
         List<Circle> allCircles = circleUserRepository.findCirclesByUserId(user);
-        List<Photo> allCirclesAllPhotos = allCircles.stream()
-                .map(circleSharedAlbumRepository::findAllByCircle)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-        return PhotoResponseDto.listOf(allCirclesAllPhotos);
+
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            List<CompletableFuture<List<Photo>>> futures = allCircles.stream()
+                    .map(circle -> CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircleId(circle), executorService))
+                    .collect(Collectors.toList());
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            allOf.get();
+
+            List<PhotoResponseDto> photoResponseDtoList = futures.stream()
+                    .map(CompletableFuture::join)
+                    .flatMap(List::stream)
+                    .map(PhotoResponseDto::of)
+                    .collect(Collectors.toList());
+            executorService.shutdown();
+            return photoResponseDtoList;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("error: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Transactional
@@ -87,12 +134,26 @@ public class PhotoService {
         return "success";
     }
 
+    @MeasureExecutionTime
     public List<PhotoResponseDto> getPhotosByCircleId(Long circleId) {
         Circle circle = circleRepository.findById(circleId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
-        List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
-        findPhotos.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
-        return PhotoResponseDto.listOf(findPhotos);
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            CompletableFuture<List<Photo>> photoListFuture = CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircleId(circle), executorService);
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(photoListFuture);
+            allOf.get();
+
+            List<PhotoResponseDto> photoResponseDtoList = photoListFuture.get().stream()
+                    .map(PhotoResponseDto::of)
+                    .collect(Collectors.toList());
+            executorService.shutdown();
+            return photoResponseDtoList;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("error: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public PhotoLocationResponseDto getLocation(Long photoId) {
