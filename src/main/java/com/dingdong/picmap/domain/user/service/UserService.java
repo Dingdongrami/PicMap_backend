@@ -105,4 +105,9 @@ public class UserService {
         user.updateProfile(null);
         return new UserProfileUpdateResponseDto(user.getId(), null);
     }
+
+    public List<UserResponseDto> getAllUser() {
+        List<User> users = userRepository.findAll();
+        return UserResponseDto.listOf(users);
+    }
 }
