@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,7 @@ public class FriendshipService {
     }
 
     // 요청 수락
+    @Transactional
     public FriendshipResponseDto acceptFriend(FriendshipRequestDto requestDto) {
         User requester = userRepository.findById(requestDto.getRequesterId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -57,7 +59,6 @@ public class FriendshipService {
         checkFriendship(friendship);
 
         friendship.accept();
-        receiver.getReceivedFriendships().remove(friendship);
         friendshipRepository.save(friendship);
         return new FriendshipResponseDto(friendship);
     }
@@ -66,7 +67,10 @@ public class FriendshipService {
     public List<FriendshipResponseDto> getFriendRequestList(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        return FriendshipResponseDto.listOf(user.getReceivedFriendships());
+        return FriendshipResponseDto.listOf(user.getReceivedFriendships()
+                .stream()
+                .filter(friendship -> !friendship.isAccepted())
+                .collect(Collectors.toList()));
     }
 
     // 친구 목록
