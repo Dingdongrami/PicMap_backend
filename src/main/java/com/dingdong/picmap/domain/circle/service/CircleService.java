@@ -38,7 +38,7 @@ public class CircleService {
     }
 
     public List<CircleResponseDto> getPublicCircles() {
-        List<Circle> circles = circleRepository.findByStatus("PUBLIC");
+        List<Circle> circles = circleRepository.findPublicAndGovernmentCircles();
         return circles.stream()
                 .map(CircleResponseDto::new)
                 .collect(Collectors.toList());
@@ -90,4 +90,10 @@ public class CircleService {
                 .forEach(circleUserRepository::delete);
     }
 
+    public List<CircleResponseDto> getGovernmentCircles() {
+        List<Circle> circles = circleRepository.findByStatus("GOVERNMENT");
+        return circles.stream()
+                .map(CircleResponseDto::new)
+                .collect(Collectors.toList());
+    }
 }

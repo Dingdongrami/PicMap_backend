@@ -17,10 +17,16 @@ public class PublicCircleController {
 
     private final CircleService circleService;
 
-    // public 한 써클 리스트 조회
+    // public & government 한 써클 리스트 조회
     @GetMapping("/public")
     public ResponseEntity<List<CircleResponseDto>> getPublicCircles() {
         return ResponseEntity.ok(circleService.getPublicCircles());
+    }
+
+    // GOVERNMENT 써클 리스트 조회
+    @GetMapping("/government")
+    public ResponseEntity<List<CircleResponseDto>> getGovernmentCircles() {
+        return ResponseEntity.ok(circleService.getGovernmentCircles());
     }
 
     @PostMapping("/join")
