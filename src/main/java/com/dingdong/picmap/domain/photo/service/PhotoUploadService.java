@@ -1,5 +1,6 @@
 package com.dingdong.picmap.domain.photo.service;
 
+import com.dingdong.picmap.config.util.MeasureExecutionTime;
 import com.dingdong.picmap.domain.circle.entity.Circle;
 import com.dingdong.picmap.domain.circle.repository.CircleRepository;
 import com.dingdong.picmap.domain.circle.repository.CircleUserRepository;
@@ -14,10 +15,6 @@ import com.dingdong.picmap.domain.sharedAlbum.mapper.CircleSharedAlbumMapper;
 import com.dingdong.picmap.domain.sharedAlbum.repository.CircleSharedAlbumRepository;
 import com.dingdong.picmap.domain.user.entity.User;
 import com.dingdong.picmap.domain.user.repository.UserRepository;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
-import com.drew.metadata.exif.GpsDirectory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +26,12 @@ import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,6 +50,7 @@ public class PhotoUploadService {
     @Autowired
     private S3Uploader s3Uploader;
 
+    @MeasureExecutionTime
     @Transactional(rollbackFor = Exception.class)
     public List<PhotoResponseDto> uploadPhoto(List<PhotoUploadRequestDto> requestDtoList, PhotoRequestDto photoRequestDto, List<MultipartFile> images) {
         if (images.isEmpty()) {
@@ -60,16 +61,38 @@ public class PhotoUploadService {
         Circle circle = circleRepository.findById(photoRequestDto.getCircleId())
                 .orElseThrow(() -> new EntityNotFoundException("써클을 찾을 수 없습니다."));
 
-        List<Photo> savedPhotoList = new ArrayList<>();
-        for (int i = 0; i < images.size(); i++) {
-            String filePath = s3Uploader.upload(images.get(i), "images");
-            Photo photo = photoEntityMapper.toPhotoEntity(user, requestDtoList.get(i));
-            photo.setFilePath(filePath);
-            Photo savedPhoto = photoUploadRepository.save(photo);
-            savedPhotoList.add(savedPhoto);
-            circleSharedAlbumRepository.save(circleSharedAlbumMapper.toCircleSharedAlbumEntity(savedPhoto, circle, user));
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        log.info("thread pool size: {}", Runtime.getRuntime().availableProcessors());
+        try {
+            List<CompletableFuture<Photo>> futures = images.stream()
+                    .map(image -> CompletableFuture.supplyAsync(() ->
+                        uploadAndSavePhoto(image, user, requestDtoList, circle), executorService))
+                    .collect(Collectors.toList());
+
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            allOf.get();    // 모든 작업이 끝날 때까지 대기
+
+            List<Photo> savedPhotoList = futures.stream()
+                    .map(CompletableFuture::join)
+                    .collect(Collectors.toList());
+
+            savedPhotoList.forEach(photo -> {
+                circleSharedAlbumRepository.save(circleSharedAlbumMapper.toCircleSharedAlbumEntity(photo, circle, user));
+            });
+            return PhotoResponseDto.listOf(savedPhotoList);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("사진 업로드 실패: {}", e.getMessage());
+            throw new RuntimeException(e);
+        } finally {
+            executorService.shutdown();
         }
-        return PhotoResponseDto.listOf(savedPhotoList);
+    }
+
+    private Photo uploadAndSavePhoto(MultipartFile image, User user, List<PhotoUploadRequestDto> requestDtoList, Circle circle) {
+        String filePath = s3Uploader.upload(image, "images");
+        Photo photo = photoEntityMapper.toPhotoEntity(user, requestDtoList.get(0));
+        photo.setFilePath(filePath);
+        return photoUploadRepository.save(photo);
     }
 
     private File convert(MultipartFile image) throws IOException {
@@ -81,26 +104,5 @@ public class PhotoUploadService {
             throw e;
         }
         return file;
-    }
-
-    private Photo setMetadata(Photo photo, MultipartFile multipartFile) throws ImageProcessingException, IOException {
-        File file = convert(multipartFile);
-        Map<String, Directory> metadata = photoMetadataService.getMetadata(file);
-
-        double latitude = 0;
-        double longitude = 0;
-        LocalDateTime shootingDate = null;
-
-        if (metadata != null) {
-            GpsDirectory gps = (GpsDirectory) metadata.get("gps");
-            ExifSubIFDDirectory exif = (ExifSubIFDDirectory) metadata.get("exif");
-
-            latitude = gps.getGeoLocation().getLatitude();
-            longitude = gps.getGeoLocation().getLongitude();
-            Date exifDate = exif.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
-            shootingDate = LocalDateTime.ofInstant(exifDate.toInstant(), ZoneId.systemDefault());
-            photo.setMetaData(latitude, longitude, shootingDate);
-        }
-        return photo;
     }
 }
