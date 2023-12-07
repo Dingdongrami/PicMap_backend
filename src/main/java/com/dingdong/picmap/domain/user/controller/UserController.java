@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -35,6 +37,11 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> getUser(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getUser(userId));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserResponseDto>> getAllUser() {
+        return ResponseEntity.ok(userService.getAllUser());
     }
 
     // 사용자 정보 수정

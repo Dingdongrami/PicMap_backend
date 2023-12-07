@@ -24,6 +24,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -88,5 +89,10 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
         user.updateProfile(null);
         return new UserProfileUpdateResponseDto(user.getId(), null);
+    }
+
+    public List<UserResponseDto> getAllUser() {
+        List<User> users = userRepository.findAll();
+        return UserResponseDto.listOf(users);
     }
 }

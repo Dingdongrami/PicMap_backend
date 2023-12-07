@@ -4,6 +4,9 @@ import com.dingdong.picmap.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @AllArgsConstructor
 public class UserResponseDto {
@@ -24,4 +27,9 @@ public class UserResponseDto {
         this.status = user.getStatus();
     }
 
+    public static List<UserResponseDto> listOf(List<User> users) {
+        return users.stream()
+                .map(UserResponseDto::new)
+                .collect(Collectors.toList());
+    }
 }
