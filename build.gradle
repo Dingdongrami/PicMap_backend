@@ -53,6 +53,9 @@ dependencies {
 	// aop
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'org.aspectj:aspectjweaver:1.9.19'
+
+	// google geo api
+	implementation 'com.google.maps:google-maps-services:2.1.2'
 }
 
 tasks.named('test') {
