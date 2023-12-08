@@ -50,12 +50,6 @@ public class CircleController extends BaseTimeEntity {
         return ResponseEntity.ok(circleCreateService.addThumbnail(circleId, file));
     }
 
-    // 비공개 써클 가입
-    @PostMapping("/private-join")
-    public ResponseEntity<String> privateCircleJoin(@RequestBody CircleJoinRequestDto requestDto) {
-        return ResponseEntity.ok(circleCreateService.privateCircleJoin(requestDto));
-    }
-
     // 써클 조회
     @GetMapping("/{circleId}")
     public ResponseEntity<CircleResponseDto> getCircle(@PathVariable Long circleId) {
