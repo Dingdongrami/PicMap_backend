@@ -31,7 +31,7 @@ public class CircleService {
 
     public List<CircleResponseDto> getCirclesByUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-        List<Circle> circles = circleUserRepository.findCirclesByUserId(user);
+        List<Circle> circles = circleUserRepository.findCirclesByUser(user);
         return circles.stream()
                 .map(CircleResponseDto::new)
                 .collect(Collectors.toList());
