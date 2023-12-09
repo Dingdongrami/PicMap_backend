@@ -56,28 +56,4 @@ public class CircleCreateService {
         circleRepository.save(circle);
         return new CircleResponseDto(circle);
     }
-
-    public String privateCircleJoin(CircleJoinRequestDto requestDto) {
-        Circle circle = circleRepository.findById(requestDto.getCircleId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 써클입니다."));
-        if (circle.getStatus().equals("PUBLIC")) {
-            throw new IllegalArgumentException("비공개 써클이 아닙니다.");
-        }
-        User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-
-        if (circleUserRepository.existsByCircleAndUser(circle, user)) {
-            throw new IllegalArgumentException("이미 가입한 써클입니다.");
-        }
-        // circle 의 유저와 친구인지 확인
-        if (circleUserRepository.findUsersByCircle(circle)
-                .stream()
-                .flatMap(u -> friendshipRepository.findByRequesterAndReceiver(u, user) != null
-                        ? Stream.of(u)
-                        : Stream.empty()).findAny().isEmpty()) {
-            throw new IllegalArgumentException("써클의 유저와 친구가 아닙니다.");
-        }
-        circleUserRepository.save(new CircleUser(circle, user));
-        return "success";
-    }
 }
