@@ -48,6 +48,12 @@ public class PhotoController {
         return ResponseEntity.ok(photoService.getPhotosByAllCirclesByUserId(userId));
     }
 
+    // 전체 public, government 써클의 사진 리스트 조회
+    @GetMapping("/get/all-circle")
+    public ResponseEntity<List<PhotoResponseDto>> getPhotoListByPublicAndGovCircles() {
+        return ResponseEntity.ok(photoService.getPhotosByPublicAndGovCircles());
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<String> deletePhoto(@RequestBody List<Long> photoIdList) {
         try {
