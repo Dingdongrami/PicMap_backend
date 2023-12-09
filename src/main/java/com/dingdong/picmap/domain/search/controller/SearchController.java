@@ -2,14 +2,12 @@ package com.dingdong.picmap.domain.search.controller;
 
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.search.dto.LatLngResponseDto;
+import com.dingdong.picmap.domain.search.dto.SearchRequestDto;
 import com.dingdong.picmap.domain.search.service.SearchService;
 import com.google.maps.model.LatLng;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -32,9 +30,9 @@ public class SearchController {
     }
 
     @GetMapping("/location")
-    public ResponseEntity<List<PhotoResponseDto>> searchPhoto(@RequestParam String address) {
+    public ResponseEntity<List<PhotoResponseDto>> searchPhoto(@RequestBody SearchRequestDto requestDto) {
         try {
-            return ResponseEntity.ok(searchService.searchPhoto(address));
+            return ResponseEntity.ok(searchService.searchPhoto(requestDto));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

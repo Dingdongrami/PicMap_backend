@@ -17,7 +17,7 @@ public interface CircleUserRepository extends JpaRepository<CircleUser, Long> {
     @Query("SELECT c FROM Circle c "
             + "INNER JOIN CircleUser cU ON cU.circle = c "
             + "WHERE cU.user = :user")
-    List<Circle> findCirclesByUserId(@Param("user") User user);
+    List<Circle> findCirclesByUser(@Param("user") User user);
 
     @Query("SELECT cU FROM CircleUser cU "
             + "WHERE cU.user = :user "

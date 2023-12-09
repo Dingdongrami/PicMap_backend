@@ -69,7 +69,7 @@ public class PhotoService {
     public List<PhotoResponseDto> getPhotosByPublicCircleByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
-        List<Circle> publicCircles = circleUserRepository.findCirclesByUserId(user)
+        List<Circle> publicCircles = circleUserRepository.findCirclesByUser(user)
                 .stream()
                 .filter(Circle::getIsPublic)
                 .collect(Collectors.toList());
@@ -98,7 +98,7 @@ public class PhotoService {
     public List<PhotoResponseDto> getPhotosByAllCirclesByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
-        List<Circle> allCircles = circleUserRepository.findCirclesByUserId(user);
+        List<Circle> allCircles = circleUserRepository.findCirclesByUser(user);
 
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
