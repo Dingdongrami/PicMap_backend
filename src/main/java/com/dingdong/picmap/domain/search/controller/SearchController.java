@@ -2,6 +2,7 @@ package com.dingdong.picmap.domain.search.controller;
 
 import com.dingdong.picmap.domain.photo.dto.PhotoResponseDto;
 import com.dingdong.picmap.domain.search.dto.LatLngResponseDto;
+import com.dingdong.picmap.domain.search.dto.SearchLocationResponseDto;
 import com.dingdong.picmap.domain.search.dto.SearchRequestDto;
 import com.dingdong.picmap.domain.search.service.SearchService;
 import com.google.maps.model.LatLng;
@@ -30,9 +31,9 @@ public class SearchController {
     }
 
     @GetMapping("/location")
-    public ResponseEntity<List<PhotoResponseDto>> searchPhoto(@RequestBody SearchRequestDto requestDto) {
+    public ResponseEntity<List<SearchLocationResponseDto>> searchPhoto(@RequestParam String address) {
         try {
-            return ResponseEntity.ok(searchService.searchPhoto(requestDto));
+            return ResponseEntity.ok(searchService.searchPhoto(address));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
