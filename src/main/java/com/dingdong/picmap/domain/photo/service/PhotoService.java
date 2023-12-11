@@ -49,7 +49,7 @@ public class PhotoService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            CompletableFuture<List<Photo>> photoListFuture = CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByUserId(user), executorService);
+            CompletableFuture<List<Photo>> photoListFuture = CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByUser(user), executorService);
             CompletableFuture<Void> allOf = CompletableFuture.allOf(photoListFuture);
             allOf.get();
 
@@ -71,12 +71,12 @@ public class PhotoService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
         List<Circle> publicCircles = circleUserRepository.findCirclesByUser(user)
                 .stream()
-                .filter(Circle::getIsPublic)
+                .filter(circle -> circle.getIsPublic() || circle.getIsGovernment())
                 .collect(Collectors.toList());
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             List<CompletableFuture<List<Photo>>> futures = publicCircles.stream()
-                    .map(circle -> CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircleId(circle), executorService))
+                    .map(circle -> CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircle(circle), executorService))
                     .collect(Collectors.toList());
             CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
             allOf.get();
@@ -103,7 +103,7 @@ public class PhotoService {
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             List<CompletableFuture<List<Photo>>> futures = allCircles.stream()
-                    .map(circle -> CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircleId(circle), executorService))
+                    .map(circle -> CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircle(circle), executorService))
                     .collect(Collectors.toList());
             CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
             allOf.get();
@@ -120,6 +120,19 @@ public class PhotoService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<PhotoResponseDto> getPhotosByPublicAndGovCircles() {
+        List<Circle> circleList = circleRepository.findByStatus("PUBLIC");
+        circleList.addAll(circleRepository.findByStatus("GOVERNMENT"));
+
+        List<Photo> photoList = circleList.stream()
+                .map(photoUploadRepository::findAllByCircle)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+        log.info("photoList: {}", photoList.size());
+
+        return PhotoResponseDto.listOf(photoList);
     }
 
     @Transactional
@@ -140,7 +153,7 @@ public class PhotoService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            CompletableFuture<List<Photo>> photoListFuture = CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircleId(circle), executorService);
+            CompletableFuture<List<Photo>> photoListFuture = CompletableFuture.supplyAsync(() -> photoUploadRepository.findAllByCircle(circle), executorService);
             CompletableFuture<Void> allOf = CompletableFuture.allOf(photoListFuture);
             allOf.get();
 
@@ -170,7 +183,7 @@ public class PhotoService {
     public List<PhotoResponseDto> getPhotosBySort(PhotoSortRequestDto requestDto) {
         Circle circle = circleRepository.findById(requestDto.getCircleId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
-        List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
+        List<Photo> findPhotos = photoUploadRepository.findAllByCircle(circle);
         switch (requestDto.getSortType()) {
             case "latest":
                 findPhotos.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
@@ -190,7 +203,7 @@ public class PhotoService {
     public List<PhotoResponseDto> getLatestPhotosByCircleId(Long circleId) {
         Circle circle = circleRepository.findById(circleId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 써클이 없습니다."));
-        List<Photo> findPhotos = photoUploadRepository.findAllByCircleId(circle);
+        List<Photo> findPhotos = photoUploadRepository.findAllByCircle(circle);
         findPhotos.sort((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()));
 
         if (findPhotos.size() >= 4) {

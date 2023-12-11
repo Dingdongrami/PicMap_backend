@@ -16,10 +16,10 @@ public interface PhotoUploadRepository extends JpaRepository<Photo, Long> {
     @Query("SELECT p FROM Photo p "
         + "INNER JOIN CircleSharedAlbum csa ON csa.photo = p "
         + "WHERE csa.user = :user")
-    List<Photo> findAllByUserId(@Param("user") User user);
+    List<Photo> findAllByUser(@Param("user") User user);
 
     @Query("SELECT p FROM Photo p "
         + "INNER JOIN CircleSharedAlbum csa ON csa.photo = p "
         + "WHERE csa.circle = :circle")
-    List<Photo> findAllByCircleId(@Param("circle")Circle circle);
+    List<Photo> findAllByCircle(@Param("circle")Circle circle);
 }

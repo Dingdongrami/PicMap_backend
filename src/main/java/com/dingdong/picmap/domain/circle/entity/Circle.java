@@ -52,6 +52,10 @@ public class Circle {
         return this.status.equals("PUBLIC");
     }
 
+    public boolean getIsGovernment() {
+        return this.status.equals("GOVERNMENT");
+    }
+
     public void updateName(String name) {
         this.name = name;
     }
